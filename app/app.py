@@ -23,9 +23,8 @@ class Main:
 
 
     def configuracoesIniciais(self):
-        glClearColor(0.1529, 0.1765, 0.2235, 1.0)    # Qual a cor o framebuffer será limpo
+        glClearColor(39.0/255.0, 45.0/255.0, 57.0/255.0, 1.0)    # Qual a cor o framebuffer será limpo
         glLineWidth(4)     # Define a largura da linha no opengl 
-
 
 
     def desenha(self):   
@@ -91,7 +90,7 @@ class Main:
         glutPostRedisplay()
 
 
-    def init(self):
+    def initOpenGL(self):
         glutInit()
         glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
         glutInitWindowSize(1024, 1024)
@@ -107,4 +106,4 @@ class Main:
 app = Main()
 
 if __name__ == "__main__":
-    app.init()
+    app.initOpenGL()
