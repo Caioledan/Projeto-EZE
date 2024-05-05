@@ -1,5 +1,5 @@
 
-def remover_linhas_repetidas(arquivo_origem, arquivo_destino):
+def valorar(arquivo_origem, arquivo_destino):
 
     
     with open(arquivo_origem, "r+") as origem, open(arquivo_destino, 'w+') as destino:
@@ -11,11 +11,11 @@ def remover_linhas_repetidas(arquivo_origem, arquivo_destino):
 
             valor = abs(p1 - p2)
 
-            destino.write(linhas[0] + ',' + linhas[1] + ',' +  str(valor) + '\n')
+            destino.write(linhas[0] + ',' + linhas[1] + ',' +  str(valor)+ ",\n")
         
 
 
 
     # origem.close()
     # destino.close()
-remover_linhas_repetidas("Trabalho\data.txt", "Trabalho\datatratada.txt")
+valorar("data\data.txt", "data\datavalorada.txt")
