@@ -19,7 +19,6 @@ class Utils():
         self.move_speed = 0.1  # Velocidade de movimento do mapa
 
 
-
     # Função para configurar o modo de perspectiva 3D
     def setup_3d_view(self):
         glMatrixMode(GL_PROJECTION)
