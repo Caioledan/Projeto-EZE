@@ -325,12 +325,8 @@ def main():
 
     pathfinder = PathFinder(graph, nodes)
     n1, n2 = random.randomizer()
-    print(n1 + "\n" + n2)
     start_node = int(n1)
     end_node = int(n2)
-    if start_node not in graph or end_node not in graph:
-        print(f"Nó {start_node} ou {end_node} não está conectado no grafo.")
-        return
 
 
     path = pathfinder.find_shortest_path(start_node, end_node)
@@ -357,10 +353,8 @@ def main():
         if keys[K_DOWN]:
             rotation_x += 1
         if keys[K_EQUALS] or keys[K_PLUS]:  # Tecla '+' para aumentar o zoom
-            print(zoom)
             zoom -= 0.1  # Aproxima a câmera
         if keys[K_MINUS]:  # Tecla '-' para diminuir o zoom
-            print(zoom)
             zoom += 0.1  # Afasta a câmera
 
         # Movimentação do mapa com as teclas W, A, S, D

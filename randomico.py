@@ -2,8 +2,8 @@ import random
 
 class Randomic:
     def __init__(self):
-        self.n1 = random.randint(1, 1683)  # O intervalo deve ser de 0 a 1043 para acessar corretamente a lista
-        self.n2 = random.randint(1, 1683)
+        self.n1 = random.randint(1, 1684)  # O intervalo deve ser de 0 a 1043 para acessar corretamente a lista
+        self.n2 = random.randint(1, 1684)
 
     def randomizer(self):
         with open("tratamento de mapa/mapa_tratado.txt", 'r') as r:  # Use 'with' para gerenciar o arquivo
