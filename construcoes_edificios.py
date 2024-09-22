@@ -317,9 +317,10 @@ def main():
     # Configura a visualização 3D
 
     # Lê o arquivo OSM
-    filename = "edificios.osm"  # Substitua pelo caminho do arquivo .osm
+    filename = "edificios2.osm"  # Substitua pelo caminho do arquivo .osm
     nodes, ways, buiding, graph, bbox = read_osm(filename)
 
+    draw_min = False
 
     random = Randomic()
 
@@ -378,10 +379,14 @@ def main():
         draw_buildings_as_cubes(nodes, buiding, bbox)
         # Desenha o mapa com profundidade
         draw_map_with_depth(nodes, ways, bbox)
-        glDisable(GL_DEPTH_TEST)
-        draw_path(nodes, path, bbox)
-        glEnable(GL_DEPTH_TEST)
- 
+
+        if keys[K_SPACE]:
+            draw_min = True
+
+        if draw_min == True:
+            glDisable(GL_DEPTH_TEST)
+            draw_path(nodes, path, bbox)
+            glEnable(GL_DEPTH_TEST)
 
       
         pygame.display.flip()
