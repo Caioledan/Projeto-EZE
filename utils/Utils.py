@@ -5,8 +5,7 @@ from OpenGL.GLU import *
 from utils.OSMHandlerConvert import OSMHandler
 from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth
 
-zoom = 1  # Zoom inicial (mais perto do que antes)
-
+zoom = 1  
 class Utils(): 
     def __init__(self):
 
@@ -52,7 +51,7 @@ class Utils():
         # Configura a visualização 3D
 
         # Lê o arquivo OSM
-        filename = "./data/edificios.osm"  # Substitua pelo caminho do arquivo .osm
+        filename = "./data/edificios2.osm"  # Substitua pelo caminho do arquivo .osm
         nodes, ways, buiding, bbox = self.read_osm(filename)
 
         # Variáveis de controle de rotação, zoom e posição do mapa
