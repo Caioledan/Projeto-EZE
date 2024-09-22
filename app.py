@@ -140,7 +140,7 @@ def main():
     start_node = int(n1)
     end_node = int(n2)
 
-    # print(start_node + "\n" + end_node)
+
 
 
     path = pathfinder.find_shortest_path(start_node, end_node)

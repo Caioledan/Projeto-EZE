@@ -11,7 +11,6 @@ class Randomic:
 
         # Verifica se os números aleatórios estão dentro do intervalo de linhas disponíveis
         if self.n1 < len(linhas) and self.n2 < len(linhas):
-            print(linhas[self.n1].strip() + "\n" +  linhas[self.n2].strip())
             return linhas[self.n1].strip(), linhas[self.n2].strip()
 
 
