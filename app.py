@@ -15,7 +15,6 @@ move_speed = 0.1  # Velocidade de movimento do mapa
 class OSMHandler(osm.SimpleHandler):
     def __init__(self):
         super().__init__()
-        
         self.nodes = {}
         self.ways = []
 
@@ -127,6 +126,7 @@ def setup_3d_view():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     gluLookAt(0, 0, zoom, 0, 0, 0, 0, 1, 0)
+    glEnable(GL_DEPTH_TEST)
 
 
 # Função principal
@@ -178,6 +178,7 @@ def main():
             print(zoom)
             zoom -= 0.1  # Aproxima a câmera
         if keys[K_MINUS]:  # Tecla '-' para diminuir o zoom
+            print(zoom)
             zoom += 0.1  # Afasta a câmera
 
         # Movimentação do mapa com as teclas W, A, S, D
