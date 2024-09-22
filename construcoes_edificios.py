@@ -4,20 +4,22 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import numpy as np
+from PathFinder import *
+from randomico import Randomic
 
 rotation_x = 0
 rotation_y = 0
 zoom = 1  # Zoom inicial (mais perto do que antes)
 move_x = 0  # Controle de movimentação no eixo X
 move_y = 0  # Controle de movimentação no eixo Y
-move_speed = 0.1  # Velocidade de movimento do mapa
+move_speed = 0.02  # Velocidade de movimento do mapa
 
 class OSMHandler(osm.SimpleHandler):
     def __init__(self):
         super().__init__()
-        
         self.nodes = {}
         self.ways = []
+        self.graph = {}
         self.buildings = []  # Lista para armazenar os prédios
 
     def node(self, n):
@@ -25,10 +27,22 @@ class OSMHandler(osm.SimpleHandler):
 
     def way(self, w):
         if 'highway' in w.tags:
-            self.ways.append([n.ref for n in w.nodes])
+            node_refs = [n.ref for n in w.nodes]
+            self.ways.append(node_refs)
+            # Cria um grafo conectando os nós adjacentes para usar no caminho mais curto
+            for i in range(len(node_refs) - 1):
+                self._add_edge(node_refs[i], node_refs[i + 1])
 
         if 'building' in w.tags:
             self.buildings.append([n.ref for n in w.nodes])  # Adiciona prédios à lista
+
+    def _add_edge(self, node1, node2):
+        if node1 not in self.graph:
+            self.graph[node1] = []
+        if node2 not in self.graph:
+            self.graph[node2] = []
+        self.graph[node1].append(node2)
+        self.graph[node2].append(node1)
 
 # Função para converter coordenadas lat/lon para coordenadas OpenGL
 def latlon_to_opengl(lat, lon, bbox, z=0):
@@ -104,6 +118,34 @@ def draw_map_with_depth(nodes, ways, bbox, street_width=0.001, depth=0.001):
             glVertex3f(v4[0], v4[1], z2 + depth)
             
     glEnd()
+
+# Função para desenhar o caminho em rosa
+def draw_path(nodes, path, bbox, street_width=0.0010, depth=0.0001):
+    glColor3f(1.0, 0.0, 1.0)  # Cor rosa
+    glBegin(GL_QUADS)
+
+    for i in range(len(path) - 1):
+        node1 = nodes[path[i]]
+        node2 = nodes[path[i + 1]]
+        x1, y1, z1 = latlon_to_opengl(node1[0], node1[1], bbox, z=0)
+        x2, y2, z2 = latlon_to_opengl(node2[0], node2[1], bbox, z=0)
+        direction = np.array([x2 - x1, y2 - y1])
+        direction = direction / np.linalg.norm(direction)
+        perpendicular = np.array([-direction[1], direction[0]]) * street_width
+        v1 = [x1 + perpendicular[0], y1 + perpendicular[1], z1]
+        v2 = [x1 - perpendicular[0], y1 - perpendicular[1], z1]
+        v3 = [x2 + perpendicular[0], y2 + perpendicular[1], z2]
+        v4 = [x2 - perpendicular[0], y2 - perpendicular[1], z2]
+        glVertex3f(v1[0], v1[1], z1 + depth)
+        glVertex3f(v2[0], v2[1], z1 + depth)
+        glVertex3f(v4[0], v4[1], z2 + depth)
+        glVertex3f(v3[0], v3[1], z2 + depth)
+        glVertex3f(v1[0], v1[1], z1)
+        glVertex3f(v2[0], v2[1], z1)
+        glVertex3f(v4[0], v4[1], z2)
+        glVertex3f(v3[0], v3[1], z2)
+    glEnd()
+
 
 
 # Função para desenhar prédios com profundidade (como prismas)
@@ -182,7 +224,7 @@ def read_osm(filename):
     lons = [coord[1] for coord in handler.nodes.values()]
     bbox = (min(lats), min(lons), max(lats), max(lons))
 
-    return handler.nodes, handler.ways, handler.buildings, bbox
+    return handler.nodes, handler.ways, handler.buildings, handler.graph, bbox
 
 # Função para configurar o modo de perspectiva 3D
 def setup_3d_view():
@@ -199,12 +241,15 @@ def setup_3d_view():
 def draw_buildings(nodes, ways, bbox, building_width=0.0001, building_height=0.0001):
     glColor3f(0.7, 0.7, 0.7)  # Cor cinza para os prédios
     glBegin(GL_QUADS)
+
     
     for way in ways:
         for i in range(len(way) - 1):
             # Pega os dois nós consecutivos que representam uma rua
             node1 = nodes[way[i]]
             node2 = nodes[way[i + 1]]
+
+            
 
             # Converte as coordenadas lat/lon em coordenadas OpenGL
             x1, y1, z1 = latlon_to_opengl(node1[0], node1[1], bbox, z=0)
@@ -271,17 +316,26 @@ def main():
     glClearColor(39.0/255.0, 45.0/255.0, 57.0/255.0, 1.0)  # Cor de fundo azul claro (R, G, B, A)
     # Configura a visualização 3D
 
+
+
     # Lê o arquivo OSM
     filename = "edificios.osm"  # Substitua pelo caminho do arquivo .osm
-    nodes, ways, buiding, bbox = read_osm(filename)
+    nodes, ways, buiding, graph, bbox = read_osm(filename)
 
-    # Variáveis de controle de rotação, zoom e posição do mapa
-    rotation_x = 0
-    rotation_y = 0
-    zoom = 1  # Zoom inicial (mais perto do que antes)
-    move_x = 0  # Controle de movimentação no eixo X
-    move_y = 0  # Controle de movimentação no eixo Y
-    move_speed = 0.1  # Velocidade de movimento do mapa
+
+    random = Randomic()
+
+    pathfinder = PathFinder(graph, nodes)
+    n1, n2 = random.randomizer()
+    print(n1 + "\n" + n2)
+    start_node = int(n1)
+    end_node = int(n2)
+    if start_node not in graph or end_node not in graph:
+        print(f"Nó {start_node} ou {end_node} não está conectado no grafo.")
+        return
+
+
+    path = pathfinder.find_shortest_path(start_node, end_node)
 
     # Loop principal do pygame
     running = True
@@ -317,9 +371,9 @@ def main():
         if keys[K_s]:
             move_y += move_speed  # Move o mapa para baixo
         if keys[K_a]:
-            move_x -= move_speed  # Move o mapa para a esquerda
+            move_x += move_speed  # Move o mapa para a esquerda
         if keys[K_d]:
-            move_x += move_speed  # Move o mapa para a direita
+            move_x -= move_speed  # Move o mapa para a direita
 
 
         # Aplica rotação no mapa
@@ -332,6 +386,9 @@ def main():
         draw_buildings_as_cubes(nodes, buiding, bbox)
         # Desenha o mapa com profundidade
         draw_map_with_depth(nodes, ways, bbox)
+        glDisable(GL_DEPTH_TEST)
+        draw_path(nodes, path, bbox)
+        glEnable(GL_DEPTH_TEST)
 
 
         # Desenha os prédios

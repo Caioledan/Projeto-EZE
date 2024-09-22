@@ -23,7 +23,7 @@ class OSMHandler(osm.SimpleHandler):
 
 # Usar o handler para processar o arquivo OSM
 handler = OSMHandler()
-handler.apply_file('map.osm')  # Substitua pelo nome do seu arquivo
+handler.apply_file('edificios.osm')  # Substitua pelo nome do seu arquivo
 
 # Salva os IDs dos nós em um arquivo
-handler.save_highway_node_ids('tratar mapa/mapa_tratado.txt')
+handler.save_highway_node_ids('tratamento de mapa/mapa_tratado.txt')
