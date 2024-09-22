@@ -1,56 +1,11 @@
-import osmium as osm
-import pygame
-from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import numpy as np
-from xml.etree.ElementTree import Element, SubElement, tostring, ElementTree
+from utils.OSMHandlerConvert import latlon_to_opengl
 
-rotation_x = 0
-rotation_y = 0
-zoom = 1  # Zoom inicial (mais perto do que antes)
-move_x = 0  # Controle de movimentação no eixo X
-move_y = 0  # Controle de movimentação no eixo Y
-move_speed = 0.1  # Velocidade de movimento do mapa
-
-class OSMHandler(osm.SimpleHandler):
-    def __init__(self):
-        super().__init__()
-        
-        self.nodes = {}
-        self.ways = []
-
-    def node(self, n):
-        self.nodes[n.id] = (n.location.lat, n.location.lon)
-
-    def way(self, w):
-        if 'highway' in w.tags:
-            self.ways.append([n.ref for n in w.nodes])
-
-# Função para converter coordenadas lat/lon para coordenadas OpenGL
-def latlon_to_opengl(lat, lon, bbox, z=0):
-    min_lat, min_lon, max_lat, max_lon = bbox
-
-    # Calcula o centro do mapa
-    # center_lat = (min_lat + max_lat) / 2
-    # center_lon = (min_lon + max_lon) / 2
-
-    x = ((lat - min_lat) / (max_lat - min_lat)) * 2 - 1
-    y = ((lon - min_lon) / (max_lon - min_lon)) * 2 - 1
-    
-
-    # # Aumenta o fator de escala
-    # lat_range = max_lat - min_lat
-    # lon_range = max_lon - min_lon
-    # scale_factor = max(lat_range, lon_range) / 2  # Ajuste o fator de escala
-
-    # Converte lat/lon para coordenadas 3D OpenGL [-1, 1]
-    # x = (lon - center_lon) / scale_factor
-    # y = (lat - center_lat) / scale_factor
-    return x, y, z
 
 # Função para desenhar ruas com profundidade (prismas)
-def draw_map_with_depth(nodes, ways, bbox, street_width=0.0010, depth=0.001):
+def draw_map_with_depth(nodes, ways, bbox, street_width=0.001, depth=0.001):
     glLineWidth(20)
     glColor3f(65.0/255.0, 85.0/255.0, 103.0/255.0)  # Cor branca para as ruas
     glBegin(GL_QUADS)  # Usamos quadrados em vez de linhas
@@ -108,31 +63,75 @@ def draw_map_with_depth(nodes, ways, bbox, street_width=0.0010, depth=0.001):
             
     glEnd()
 
-# Função para ler o arquivo OSM e extrair as coordenadas e vias
-def read_osm(filename):
-    handler = OSMHandler()
-    handler.apply_file(filename)
 
-    # Encontrar os limites geográficos (bounding box)
-    lats = [coord[0] for coord in handler.nodes.values()]
-    lons = [coord[1] for coord in handler.nodes.values()]
-    bbox = (min(lats), min(lons), max(lats), max(lons))
+# Função para desenhar prédios com profundidade (como prismas)
+# Função para desenhar prédios no formato de cubos
+def draw_buildings_as_cubes(nodes, buildings, bbox, building_width=0.0001, building_height=0.001):
+    glColor3f(0.7, 0.7, 0.7)  # Cor cinza para os prédios
+    glBegin(GL_QUADS)  # Usamos quadrados para desenhar as faces
 
-    return handler.nodes, handler.ways, bbox
+    for building in buildings:
+        if len(building) < 2:
+            continue
 
-# Função para configurar o modo de perspectiva 3D
-def setup_3d_view():
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(90, 800 / 600, 0.1, 100.0)  # Ângulo de visão, proporção e profundidade ajustados
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    gluLookAt(0, 0, zoom, 0, 0, 0, 0, 1, 0)
-    glEnable(GL_DEPTH_TEST)
+        vertices = []
+        for node_id in building:
+            node = nodes.get(node_id)
+            if node:
+                x, y, z = latlon_to_opengl(node[0], node[1], bbox, z=0)
+                vertices.append([x, y, z])
+
+        # Se não houver vértices suficientes para desenhar o prédio, continue
+        if len(vertices) < 3:
+            continue
+
+        # Desenhar as faces do prédio como cubo
+        for i in range(len(vertices)):
+            next_i = (i + 1) % len(vertices)
+
+            # Face inferior (base do cubo)
+            glVertex3f(vertices[i][0] - building_width/2, vertices[i][1] - building_width/2, 0)
+            glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] - building_width/2, 0)
+            glVertex3f(vertices[next_i][0] + building_width/2, vertices[next_i][1] + building_width/2, 0)
+            glVertex3f(vertices[i][0] + building_width/2, vertices[i][1] + building_width/2, 0)
+
+            # Face superior (teto do cubo)
+            glVertex3f(vertices[i][0] - building_width/2, vertices[i][1] - building_width/2, building_height)
+            glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] - building_width/2, building_height)
+            glVertex3f(vertices[next_i][0] + building_width/2, vertices[next_i][1] + building_width/2, building_height)
+            glVertex3f(vertices[i][0] + building_width/2, vertices[i][1] + building_width/2, building_height)
+
+            # Desenhar as faces laterais (laterais do cubo)
+            # Lado 1
+            glVertex3f(vertices[i][0] - building_width/2, vertices[i][1] - building_width/2, 0)
+            glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] - building_width/2, 0)
+            glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] - building_width/2, building_height)
+            glVertex3f(vertices[i][0] - building_width/2, vertices[i][1] - building_width/2, building_height)
+
+            # Lado 2
+            glVertex3f(vertices[i][0] + building_width/2, vertices[i][1] - building_width/2, 0)
+            glVertex3f(vertices[next_i][0] + building_width/2, vertices[next_i][1] - building_width/2, 0)
+            glVertex3f(vertices[next_i][0] + building_width/2, vertices[next_i][1] - building_width/2, building_height)
+            glVertex3f(vertices[i][0] + building_width/2, vertices[i][1] - building_width/2, building_height)
+
+            # Lado 3
+            glVertex3f(vertices[i][0] + building_width/2, vertices[i][1] + building_width/2, 0)
+            glVertex3f(vertices[next_i][0] + building_width/2, vertices[next_i][1] + building_width/2, 0)
+            glVertex3f(vertices[next_i][0] + building_width/2, vertices[next_i][1] + building_width/2, building_height)
+            glVertex3f(vertices[i][0] + building_width/2, vertices[i][1] + building_width/2, building_height)
+
+            # Lado 4
+            glVertex3f(vertices[i][0] - building_width/2, vertices[i][1] + building_width/2, 0)
+            glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] + building_width/2, 0)
+            glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] + building_width/2, building_height)
+            glVertex3f(vertices[i][0] - building_width/2, vertices[i][1] + building_width/2, building_height)
+
+    glEnd()
+
 
 
 # Função para desenhar casas (cubos/prismas) ao lado das ruas
-def draw_buildings(nodes, ways, bbox, building_width=0.002, building_height=0.001):
+def draw_buildings(nodes, ways, bbox, building_width=0.0001, building_height=0.0001):
     glColor3f(0.7, 0.7, 0.7)  # Cor cinza para os prédios
     glBegin(GL_QUADS)
     
@@ -194,88 +193,3 @@ def draw_buildings(nodes, ways, bbox, building_width=0.002, building_height=0.00
                 glVertex3f(v3[0], v3[1], v3[2])
 
     glEnd()
-
-
-# Função principal
-def main():
-    global rotation_x, rotation_y, zoom, move_x, move_y, move_speed
-    # Inicializa pygame
-    pygame.init()
-    display = (1080, 920)
-    pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-
-    glClearColor(39.0/255.0, 45.0/255.0, 57.0/255.0, 1.0)  # Cor de fundo azul claro (R, G, B, A)
-    # Configura a visualização 3D
-
-    # Lê o arquivo OSM
-    filename = "limoeiro.osm"  # Substitua pelo caminho do arquivo .osm
-    nodes, ways, bbox = read_osm(filename)
-
-    # Variáveis de controle de rotação, zoom e posição do mapa
-    rotation_x = 0
-    rotation_y = 0
-    zoom = 1  # Zoom inicial (mais perto do que antes)
-    move_x = 0  # Controle de movimentação no eixo X
-    move_y = 0  # Controle de movimentação no eixo Y
-    move_speed = 0.1  # Velocidade de movimento do mapa
-
-    # Loop principal do pygame
-    running = True
-    while running:
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)    
-
-        setup_3d_view()
-
-    
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        # Controle de rotação, zoom e movimento com o teclado
-        keys = pygame.key.get_pressed()
-        if keys[K_LEFT]:
-            rotation_y -= 1
-        if keys[K_RIGHT]:
-            rotation_y += 1
-        if keys[K_UP]:
-            rotation_x -= 1
-        if keys[K_DOWN]:
-            rotation_x += 1
-        if keys[K_EQUALS] or keys[K_PLUS]:  # Tecla '+' para aumentar o zoom
-            print(zoom)
-            zoom -= 0.1  # Aproxima a câmera
-        if keys[K_MINUS]:  # Tecla '-' para diminuir o zoom
-            print(zoom)
-            zoom += 0.1  # Afasta a câmera
-
-        # Movimentação do mapa com as teclas W, A, S, D
-        if keys[K_w]:
-            move_y -= move_speed  # Move o mapa para cima
-        if keys[K_s]:
-            move_y += move_speed  # Move o mapa para baixo
-        if keys[K_a]:
-            move_x -= move_speed  # Move o mapa para a esquerda
-        if keys[K_d]:
-            move_x += move_speed  # Move o mapa para a direita
-
-
-        # Aplica rotação no mapa
-        glRotatef(rotation_x, 1, 0, 0)  # Rotaciona em torno do eixo X
-        glRotatef(rotation_y, 0, 1, 0)  # Rotaciona em torno do eixo Y
-
-        # Aplica movimentação no mapa
-        glTranslatef(move_x, move_y, 0)  # Move o mapa para cima/baixo e esquerda/direita
-
-        # Desenha o mapa com profundidade
-        draw_map_with_depth(nodes, ways, bbox)
-
-        # Funcao para fazer a construcoes do mapa
-        # draw_buildings(nodes, ways, bbox)
-
-        pygame.display.flip()
-        pygame.time.wait(10)
-
-    pygame.quit()
-
-if __name__ == "__main__":
-    main()
