@@ -1,0 +1,18 @@
+import random
+
+class Randomic:
+    def __init__(self):
+        self.n1 = random.randint(1, 906)  # O intervalo deve ser de 0 a 1043 para acessar corretamente a lista
+        self.n2 = random.randint(1, 906)
+
+    def randomizer(self):
+        with open("tratamento de mapa/mapa_tratado.txt", 'r') as r:  # Use 'with' para gerenciar o arquivo
+            linhas = r.readlines()
+
+        # Verifica se os números aleatórios estão dentro do intervalo de linhas disponíveis
+        if self.n1 < len(linhas) and self.n2 < len(linhas):
+            print(linhas[self.n1].strip() + "\n" +  linhas[self.n2].strip())
+            return linhas[self.n1].strip(), linhas[self.n2].strip()
+
+
+
