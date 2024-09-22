@@ -121,7 +121,7 @@ def draw_map_with_depth(nodes, ways, bbox, street_width=0.001, depth=0.001):
 
 # Função para desenhar o caminho em rosa
 def draw_path(nodes, path, bbox, street_width=0.0010, depth=0.0001):
-    glColor3f(1.0, 0.0, 1.0)  # Cor rosa
+    glColor3f(40.0/255.0, 224.0/255.0, 254.0/255.0)  # Cor rosa
     glBegin(GL_QUADS)
 
     for i in range(len(path) - 1):
@@ -316,8 +316,6 @@ def main():
     glClearColor(39.0/255.0, 45.0/255.0, 57.0/255.0, 1.0)  # Cor de fundo azul claro (R, G, B, A)
     # Configura a visualização 3D
 
-
-
     # Lê o arquivo OSM
     filename = "edificios.osm"  # Substitua pelo caminho do arquivo .osm
     nodes, ways, buiding, graph, bbox = read_osm(filename)
@@ -389,10 +387,9 @@ def main():
         glDisable(GL_DEPTH_TEST)
         draw_path(nodes, path, bbox)
         glEnable(GL_DEPTH_TEST)
+ 
 
-
-        # Desenha os prédios
-        
+      
         pygame.display.flip()
         pygame.time.wait(10)
 
