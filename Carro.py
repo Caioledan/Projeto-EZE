@@ -33,28 +33,18 @@ class Carro:
         vetorVertCarro = glm.normalize(vertice - self.posicao)#Vetor que sai do carro até o vertice e normalizo ele.
         escalar = glm.dot(self.direcao,vetorVertCarro) #Vai me voltar o cosseno desses angulos
         angulo = glm.acos(escalar) #Uso a função
-        print(angulo)
 
-        # Determina o eixo de rotação (assumindo que o carro está no plano XY, o eixo de rotação é Z)
-        eixoRotacao = glm.vec3(0, 0, 1)
-        
         # Produto vetorial entre a direção atual e o vetor até o vértice
         produtoVetorial = glm.cross(self.direcao, vetorVertCarro)
         
-        # Se a componente Z do produto vetorial for negativa, rotacionar para a direita
+        #se a componente Z do produto vetorial for negativa, rotacionar para a direita
         if produtoVetorial.z < 0:
-            angulo = -angulo  # Rotaciona para a direita (sentido horário)
+            angulo = -angulo  #rotaciona para a direita (sentido horário)
         
         # Aplica a rotação da direção e do vetor lateral com base no ângulo e eixo Z
-        self.direcao = glm.normalize(glm.rotate(angulo, eixoRotacao) * self.direcao)
-        self.lateral = glm.normalize(glm.rotate(angulo, eixoRotacao) * self.lateral)
+        self.direcao = glm.normalize(glm.rotate(angulo) * self.direcao)
+        self.lateral = glm.normalize(glm.rotate(angulo) * self.lateral)
 
-        # if (angulo > 0.50):
-        #     self.direcao = glm.rotate(-angulo) * self.direcao
-        #     self.lateral = glm.rotate(-angulo) * self.lateral
-        # else:
-        #     self.direcao = glm.rotate(angulo) * self.direcao
-        #     self.lateral = glm.rotate(angulo) * self.lateral
         glm.normalize(self.direcao)
         glm.normalize(self.lateral)
         self.calcMatriz()
