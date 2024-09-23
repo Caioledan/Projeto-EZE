@@ -2,10 +2,11 @@ import pygame
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from utils.OSMHandlerConvert import OSMHandler
+from utils.OSMHandlerConvert import OSMHandler, latlon_to_opengl
 from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth, draw_path
 from utils.PathFinder import PathFinder
 from utils.randomicc import Randomic
+from utils.Carro import *
 
 zoom = 1  
 class Utils(): 
@@ -18,6 +19,11 @@ class Utils():
         self.move_x = 0  # Controle de movimentação no eixo X
         self.move_y = 0  # Controle de movimentação no eixo Y
         self.move_speed = 0.1  # Velocidade de movimento do mapa
+        self.posicao = glm.vec3(0,0,0) #posição do carro
+        self.direcao = glm.vec3(0,1,0) #vetor direção no eixo y
+        self.lateral = glm.vec3(1,0,0) #vetor lateral no eixo x
+        self.trajeto = []
+
 
 
     # Função para configurar o modo de perspectiva 3D
@@ -40,6 +46,21 @@ class Utils():
         bbox = (min(lats), min(lons), max(lats), max(lons))
 
         return handler.nodes, handler.ways, handler.buildings, handler.graph, bbox
+    
+    def create_path(self, nodes, path, bbox):
+        
+
+        for i in range(len(path) - 1):
+            node1 = nodes[path[i]]
+            node2 = nodes[path[i + 1]]
+
+            x1, y1, z1 = latlon_to_opengl(node1[0], node1[1], bbox, z=0)
+            x2, y2, z2 = latlon_to_opengl(node2[0], node2[1], bbox, z=0)
+
+            self.trajeto.append(glm.vec3(x1,y1,z1))
+            self.trajeto.append(glm.vec3(x2,y2,z2))
+
+
 
     # Função principal
     def main(self):
@@ -51,6 +72,8 @@ class Utils():
 
         glClearColor(39.0/255.0, 45.0/255.0, 57.0/255.0, 1.0)  # Cor de fundo azul claro (R, G, B, A)
         # Configura a visualização 3D
+
+        glOrtho(-1,1,-1,1,-2,2)
 
         # Lê o arquivo OSM
         filename = "data/map.osm"  # Substitua pelo caminho do arquivo .osm
@@ -67,6 +90,18 @@ class Utils():
 
 
         path = pathfinder.find_shortest_path(start_node, end_node)
+
+
+        carro = Carro(self.posicao, self.direcao, self.lateral)
+
+        self.create_path(nodes,path,bbox)
+
+        vertice = 0
+
+        carro.setarPosicaoInicio(*self.trajeto[vertice])
+        print(carro.posicao)
+        carro.calculaProxDirec(self.trajeto[vertice+1])
+
 
         # Loop principal do pygame
         running = True
@@ -121,10 +156,18 @@ class Utils():
                 pygame.time.delay(50)
                 
 
-            if draw_min == True:
+            if draw_min:
                 glDisable(GL_DEPTH_TEST)
                 draw_path(nodes, path, bbox)
                 glEnable(GL_DEPTH_TEST)
+
+
+
+            glLineWidth(0.01)
+            glPushMatrix()
+            glScale(0.005, 0.005,0.005)
+            carro.desenhar()
+            glPopMatrix()
 
         
             pygame.display.flip()
