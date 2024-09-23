@@ -32,21 +32,21 @@ class Carro:
     def calculaProxDirec(self,vertice):
         vetorVertCarro = glm.normalize(vertice - self.posicao)#Vetor que sai do carro até o vertice e normalizo ele.
         escalar = glm.dot(self.direcao,vetorVertCarro) #Vai me voltar o cosseno desses angulos
-        angulo = glm.acos(escalar) #Uso a função
+        angulo = glm.acos(escalar) #Uso a função para pegar o angulo desse cosseno.
 
-        # Produto vetorial entre a direção atual e o vetor até o vértice
+        #Faço produto vetorial entre os dois vetores para saber a direção deles.
         produtoVetorial = glm.cross(self.direcao, vetorVertCarro)
         
         #se a componente Z do produto vetorial for negativa, rotacionar para a direita
         if produtoVetorial.z < 0:
             angulo = -angulo  #rotaciona para a direita (sentido horário)
         
-        # Aplica a rotação da direção e do vetor lateral com base no ângulo e eixo Z
+        #aplica a rotação da direção e do vetor lateral com base no ângulo e eixo Z
         self.direcao = glm.normalize(glm.rotate(angulo) * self.direcao)
         self.lateral = glm.normalize(glm.rotate(angulo) * self.lateral)
 
-        glm.normalize(self.direcao)
-        glm.normalize(self.lateral)
+        # glm.normalize(self.direcao)
+        # glm.normalize(self.lateral)
         self.calcMatriz()
         
 

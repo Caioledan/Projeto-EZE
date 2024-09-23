@@ -17,7 +17,8 @@ trajeto = [glm.vec3(2,2,0),
            glm.vec3(6,2,0),
            glm.vec3(7,3,0),
            glm.vec3(6,5,0),
-           glm.vec3(5,6,0)] #percurso
+           glm.vec3(5,6,0),
+           glm.vec3(-5,10,0)] #percurso
 
 carro = Carro(posicao,direcao,lateral)
 
@@ -61,7 +62,7 @@ def inicio():
     glClearColor(0.5,0.5,0.5,0.5)#Cor do fundo
     glEnable(GL_DEPTH_TEST)  # Habilita o teste de profundidade
 
-vertice = 0
+vertice = 0 #Variável que vai dizer o índice do vertice na lista para o carro andar.
 carro.calculaProxDirec(trajeto[vertice])
 
 def timer(v):
@@ -73,20 +74,22 @@ def timer(v):
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     #definindo a posição da câmera um pouco atrás e acima do carro
-    gluLookAt(carro.posicao.x-1, carro.posicao.y, 0.7,  
+    gluLookAt(-carro.direcao.x, -carro.direcao.y, 1,  
               *carro.posicao,  
-              0, 0, 1)  
+              0, 0, 1) 
 
 
-
-    if vertice < len(trajeto)-1:
+    if vertice < len(trajeto):
         if(glm.distance(carro.posicao,trajeto[vertice]) < 0.1): #Ao chegar no vértice, recalcula para o outro.
-            vertice = vertice + 1
-            carro.calculaProxDirec(trajeto[vertice])
-            carro.andar()
-            carro.calcMatriz()
-        else:
-            carro.andar()
+            if(trajeto[vertice] != trajeto[len(trajeto)-1]): #O carro só vai andar até ele chegar no último vértice
+                vertice = vertice + 1  #Incrementa para pegar o proximo vertice do trajeto
+                carro.calculaProxDirec(trajeto[vertice]) #Calculo a direção dele
+                carro.andar() #Coloco o carro para andar
+                carro.calcMatriz() #E calculo a matriz de transformação.
+            else:
+                pass #Quando estiver no último vértice, o carro para.
+        else:#Se não estiver perto do outro vértice, vai andando até chegar nele.
+            carro.andar() 
             carro.calcMatriz()
         
 
