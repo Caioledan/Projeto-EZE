@@ -8,7 +8,7 @@ v4 = [-1,-1,0.50]
 v5 = [1,-1,0.50]
 v6 = [0,1,0.50]
 M = glm.mat4(1)
-velocidade = 0.01
+velocidade = 0.05
 trajeto = [v1,v2,v3,v4,v5,v6]
 
 class Carro:
@@ -18,7 +18,14 @@ class Carro:
         self.lateral = lateral
         self.velocidade = velocidade
 
-    
+
+    def setarPosicaoInicio(self, x,y,z):
+        self.posicao.x = x
+        self.posicao.y = y
+        self.posicao.z = z
+        self.calcMatriz()
+
+
     def calcMatriz(self):
         global M
         M[0] = glm.vec4(self.lateral,0) #1 COLUNA VETOR I, lateral do carro
@@ -42,11 +49,9 @@ class Carro:
             angulo = -angulo  #rotaciona para a direita (sentido horário)
         
         #aplica a rotação da direção e do vetor lateral com base no ângulo e eixo Z
-        self.direcao = glm.normalize(glm.rotate(angulo) * self.direcao)
-        self.lateral = glm.normalize(glm.rotate(angulo) * self.lateral)
+        self.direcao = glm.rotate(angulo) * self.direcao
+        self.lateral = glm.rotate(angulo) * self.lateral
 
-        # glm.normalize(self.direcao)
-        # glm.normalize(self.lateral)
         self.calcMatriz()
         
 

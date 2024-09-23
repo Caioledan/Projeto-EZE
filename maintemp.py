@@ -2,7 +2,6 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import glm
-from glfw import get_time
 from Carro import *
 import numpy as np
 
@@ -18,10 +17,11 @@ trajeto = [glm.vec3(2,2,0),
            glm.vec3(7,3,0),
            glm.vec3(6,5,0),
            glm.vec3(5,6,0),
-           glm.vec3(-5,10,0)] #percurso
+           glm.vec3(-5,10,0),
+           glm.vec3(-50,11,0)] #percurso
+
 
 carro = Carro(posicao,direcao,lateral)
-
 
 def desenhapercurso():
     global trajeto
@@ -29,7 +29,7 @@ def desenhapercurso():
     glColor3f(1,0.5,0)
     glBegin(GL_LINE_STRIP)
     for i in trajeto:
-        glVertex3f(i.x,i.y,i.z)
+        glVertex3f(*i)
     glEnd()
    
 
@@ -62,22 +62,30 @@ def inicio():
     glClearColor(0.5,0.5,0.5,0.5)#Cor do fundo
     glEnable(GL_DEPTH_TEST)  # Habilita o teste de profundidade
 
+
 vertice = 0 #Variável que vai dizer o índice do vertice na lista para o carro andar.
-carro.calculaProxDirec(trajeto[vertice])
+carro.setarPosicaoInicio(-10,-5,0) #Seto o carro com uma posição inicial
+carro.calculaProxDirec(trajeto[vertice]) #E faço ele ficar em direção ao vértice do trajeto.
+
+#variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
+posCameraAtual = glm.vec3(0, 0, 5)
+suavizacaoCamera = 0.05  #variavel para a suavização
 
 def timer(v):
-    global carro,vertice
+    global carro,vertice, posCameraAtual,suavizacaoCamera
     #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução
     glutTimerFunc(int(1000/60), timer, 0)  
 
     #Atualizando a posição da câmera
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    #definindo a posição da câmera um pouco atrás e acima do carro
-    gluLookAt(-carro.direcao.x, -carro.direcao.y, 1,  
-              *carro.posicao,  
-              0, 0, 1) 
+    posCameraDesejada = carro.posicao - carro.direcao + glm.vec3(0, 0, 0.75) #posição desejada da câmera, atrás do vetor direção carro.
+    posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera atual com a que deseja chegar.
 
+    gluLookAt(posCameraAtual.x, posCameraAtual.y, posCameraAtual.z,  #posição suavizada da câmera
+              *carro.posicao,  # Ponto suavizado para o qual a câmera olha
+              0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
+    
 
     if vertice < len(trajeto):
         if(glm.distance(carro.posicao,trajeto[vertice]) < 0.1): #Ao chegar no vértice, recalcula para o outro.
@@ -91,8 +99,6 @@ def timer(v):
         else:#Se não estiver perto do outro vértice, vai andando até chegar nele.
             carro.andar() 
             carro.calcMatriz()
-        
-
 
     glutPostRedisplay()
 
@@ -101,9 +107,6 @@ def timer(v):
 def desenhar():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) # Limpa o conteÃºdo do frame buffer aplicando a cor usada em glClearColor em toda a imagem
     
-
-
-
     desenhaLinhasXeYeZ()
 
     glPushMatrix()
@@ -112,13 +115,6 @@ def desenhar():
     glPopMatrix()
 
     desenhapercurso()
-
-
-    # # Cálculo do deltaTime e velocidade
-    # frameAtual = get_time()
-    # deltaTime = frameAtual - ultimoFrame
-    # ultimoFrame = frameAtual
-    # velocidade = 2.5 * deltaTime
   
     glutSwapBuffers()
 
