@@ -95,7 +95,7 @@ def draw_path(nodes, path, bbox, street_width=0.0010, depth=0.0001):
 
 
 
-def draw_buildings_as_cubes(nodes, buildings, bbox, building_width=0.0001, building_height=0.001):
+def draw_buildings_as_cubes(nodes, buildings, bbox, building_width=0.0001, building_height=0.003):
     glColor3f(0.7, 0.7, 0.7)  # Cor cinza para os prédios
     glBegin(GL_QUADS)  # Usamos quadrados para desenhar as faces
 

@@ -26,5 +26,4 @@ handler = OSMHandler()
 handler.apply_file('data/map.osm')  # Substitua pelo nome do seu arquivo
 
 # Salva os IDs dos nós em um arquivo
-handler.save_highway_node_ids('tratamento de mapa/mapa_tratado.txt')
-print("mapa tratado")
+handler.save_highway_node_ids('map/treated_map.txt')

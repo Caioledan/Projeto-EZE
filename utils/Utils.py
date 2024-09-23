@@ -5,7 +5,7 @@ from OpenGL.GLU import *
 from utils.OSMHandlerConvert import OSMHandler
 from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth, draw_path
 from utils.PathFinder import PathFinder
-from utils.randomico import Randomic
+from utils.randomicc import Randomic
 
 zoom = 1  
 class Utils(): 
@@ -116,8 +116,10 @@ class Utils():
             # Desenha o mapa com profundidade
             draw_map_with_depth(nodes, ways, bbox)
 
-            if keys[K_SPACE]:
-                draw_min = True
+            if keys[K_SPACE]: # Caso a tecla espaço seja apertada, um caminho será traçado no mapa
+                draw_min = not draw_min
+                pygame.time.delay(50)
+                
 
             if draw_min == True:
                 glDisable(GL_DEPTH_TEST)

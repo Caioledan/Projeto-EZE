@@ -6,7 +6,7 @@ class Randomic:
         self.n2 = random.randint(1, 1683)
 
     def randomizer(self):
-        with open("tratamento de mapa/mapa_tratado.txt", 'r') as r:  # Use 'with' para gerenciar o arquivo
+        with open("map/treated_map.txt", 'r') as r:  # Use 'with' para gerenciar o arquivo
             linhas = r.readlines()
 
         # Verifica se os números aleatórios estão dentro do intervalo de linhas disponíveis
