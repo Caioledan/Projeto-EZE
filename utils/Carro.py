@@ -38,13 +38,13 @@ class Carro:
 
 
     def calculaProxDirec(self,vertice):
-        vetorVertCarro = vertice - self.posicao#Vetor que sai do carro até o vertice e normalizo ele.
+        vetorVertCarro = glm.normalize(vertice - self.posicao)#Vetor que sai do carro até o vertice e normalizo ele.
 
-        if glm.length(vetorVertCarro) > 0:
-            vetorVertCarro = glm.normalize(vetorVertCarro)
+        # if glm.length(vetorVertCarro) > 0:
+        #     vetorVertCarro = glm.normalize(vetorVertCarro)
 
         escalar = glm.dot(self.direcao,vetorVertCarro) #Vai me voltar o cosseno desses angulos
-        escalar = glm.clamp(escalar, -1.0, 1.0)  # Garantir que o valor esteja no intervalo correto
+        escalar = glm.clamp(escalar, -1.0, 1.0)  #Uso o clamp pra garantir que o valor esteja no intervalo correto.
         angulo = glm.acos(escalar) #Uso a função para pegar o angulo desse cosseno.
 
         #Faço produto vetorial entre os dois vetores para saber a direção deles.
