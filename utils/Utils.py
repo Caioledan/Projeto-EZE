@@ -40,16 +40,14 @@ class Utils():
 
 
     def setup_3d_view(self):
+        global posCameraAtual
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(90, 800 / 600, 0.1, 100.0)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        posCameraDesejada = glm.vec3(0, 0, self.zoom)  # Ajuste a posição da câmera com base no zoom
-        gluLookAt(posCameraDesejada.x, posCameraDesejada.y, posCameraDesejada.z,  # Posição da câmera
-              0, 0, 0,  # Alvo da câmera
-              0, 1, 0)  # Vetor 'up'
-        glEnable(GL_DEPTH_TEST)
+        gluLookAt(0, 0, self.zoom, 0, 0, 0, 0, 1, 0)
+
 
     def read_osm(self, filename):
         handler = OSMHandler()
@@ -68,6 +66,7 @@ class Utils():
             x2, y2, z2 = latlon_to_opengl(node2[0], node2[1], bbox, z=0)
             trajeto.append(glm.vec3(x1, y1, z1))
             trajeto.append(glm.vec3(x2, y2, z2))
+
 
     def keyboard_callback(self, key, x, y):
         # Controle de rotação, zoom e movimento
@@ -131,19 +130,21 @@ class Utils():
 
 
     def timer(self,v):
-        global vertice, posCameraAtual,suavizacaoCamera
-        #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução
+        global vertice, posCameraAtual, suavizacaoCamera
+
+        #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução.
         glutTimerFunc(int(1000/60), self.timer, 0)  
         #Atualizando a posição da câmera
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        posCameraDesejada = carro.posicao - carro.direcao + glm.vec3(0, 0, 0.75) #posição desejada da câmera, atrás do vetor direção self.carro.
+        posCameraDesejada = carro.posicao - carro.direcao + glm.vec3(0, 0, 0.05) #posição desejada da câmera, atrás do vetor direção self.carro.
         posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera        atual com a que deseja chegar.
         gluLookAt(posCameraAtual.x, posCameraAtual.y, posCameraAtual.z,  #posição suavizada da câmera
                   *carro.posicao,  # Ponto suavizado para o qual a câmera olha
                   0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
+        
         if vertice < len(trajeto):
-            if(glm.distance(carro.posicao,trajeto[vertice]) < 0.1): #Ao chegar no vértice, recalcula para o outro.
+            if(glm.distance(carro.posicao,trajeto[vertice]) < 0.008): #Ao chegar no vértice, recalcula para o outro.
                 if(trajeto[vertice] != trajeto[len(trajeto)-1]): #O self.carro só vai andar até ele chegar no último vértice
                     vertice = vertice + 1  #Incrementa para pegar o proximo vertice do trajeto
                     carro.calculaProxDirec(trajeto[vertice]) #Calculo a direção dele
@@ -154,6 +155,7 @@ class Utils():
             else:#Se não estiver perto do outro vértice, vai andando até chegar nele
                 carro.andar() #Coloco o self.carro para andar
                 carro.calcMatriz() #E calculo a matriz de transformação.
+
         glutPostRedisplay()
 
 

@@ -72,7 +72,6 @@ def draw_path(nodes, path, bbox, street_width=5):
     glLineWidth(street_width)  # Largura da linha para destacar o caminho
     glBegin(GL_LINES)
 
-    vertices = []
 
     for i in range(len(path) - 1):
         node1 = nodes[path[i]]
@@ -80,11 +79,6 @@ def draw_path(nodes, path, bbox, street_width=5):
 
         x1, y1, z1 = latlon_to_opengl(node1[0], node1[1], bbox, z=0)
         x2, y2, z2 = latlon_to_opengl(node2[0], node2[1], bbox, z=0)
-
-
-        vertices.append(set([x1,y1,z1]))
-        
-
 
         # Desenha uma linha entre os dois nós
         glVertex3f(x1, y1, z1)
