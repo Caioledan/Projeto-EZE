@@ -8,24 +8,6 @@ from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth, draw_pa
 from utils.PathFinder import PathFinder
 from utils.randomicc import Randomic
 from utils.Carro import *
-import numpy as np
-
-
-
-posicao = glm.vec3(0,0,0) #posição do carro
-direcao = glm.vec3(0,1,0) #vetor direção no eixo y
-lateral = glm.vec3(1,0,0) #vetor lateral no eixo x
-carro = Carro(posicao, direcao, lateral)
-
-
-trajeto = [glm.vec3(2,2,0),
-           glm.vec3(4,2,0),
-           glm.vec3(6,2,0),
-           glm.vec3(7,3,0),
-           glm.vec3(6,5,0),
-           glm.vec3(5,6,0),
-           glm.vec3(-5,10,0),
-           glm.vec3(-50,11,0)] #percurso
 
 #variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
 posCameraAtual = glm.vec3(0, 0, 0.02)
@@ -48,17 +30,8 @@ class Utils():
         self.move_x = 0
         self.move_y = 0
         self.move_speed = 0.1
-<<<<<<< HEAD
-        #self.posicao = glm.vec3(0, 0, 0)  # Posição do carro
-        #self.direcao = glm.vec3(0, 1, 0)  # Vetor direção no eixo y
-        #self.lateral = glm.vec3(1, 0, 0)  # Vetor lateral no eixo x
-        self.trajeto = []
-        self.draw_min = False
-        #self.carro = None
-=======
         self.draw_min = False
         self.move = False
->>>>>>> c8b7a45b06d4b9de3b9405c787d31b1d8d0506b7
         self.nodes = None
         self.bbox = None
         self.path = None
@@ -150,56 +123,17 @@ class Utils():
 
         glutSwapBuffers()
 
-<<<<<<< HEAD
-    global carro
-    vertice = 0 #Variável que vai dizer o índice do vertice na lista para o carro andar.
-    carro.setarPosicaoInicio(*trajeto[vertice]) #Seto o carro com uma posição inicial
-    carro.calculaProxDirec(trajeto[vertice+1]) #E faço ele ficar em direção ao vértice do trajeto.
-
-    #variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
-    posCameraAtual = glm.vec3(0, 0, 5)
-    suavizacaoCamera = 0.05  #variavel para a suavização
-    def timer(self, v):
-        global carro,vertice, posCameraAtual,suavizacaoCamera
-        #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução
-=======
 
 
     def timer(self,v):
         global vertice, posCameraAtual, suavizacaoCamera,carro
 
         #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução.
->>>>>>> c8b7a45b06d4b9de3b9405c787d31b1d8d0506b7
         glutTimerFunc(int(1000/60), self.timer, 0)  
 
         #Atualizando a posição da câmera
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-<<<<<<< HEAD
-        posCameraDesejada = carro.posicao - carro.direcao + glm.vec3(0, 0, 0.75) #posição desejada da câmera, atrás do vetor direção carro.
-        posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera atual com a que deseja chegar.
-
-        gluLookAt(posCameraAtual.x, posCameraAtual.y, posCameraAtual.z,  #posição suavizada da câmera
-                *carro.posicao,  # Ponto suavizado para o qual a câmera olha
-                0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
-        
-
-        if vertice < len(self.trajeto):
-            if(glm.distance(carro.posicao,self.trajeto[vertice]) < 0.1): #Ao chegar no vértice, recalcula para o outro.
-                if(self.trajeto[vertice] != self.trajeto[len(self.trajeto)-1]): #O carro só vai andar até ele chegar no último vértice
-                    vertice = vertice + 1  #Incrementa para pegar o proximo vertice do trajeto
-                    carro.calculaProxDirec(self.trajeto[vertice]) #Calculo a direção dele
-                    carro.andar() #Coloco o carro para andar
-                    carro.calcMatriz() #E calculo a matriz de transformação.
-                else:
-                    pass #Quando estiver no último vértice, o carro para.
-            else:#Se não estiver perto do outro vértice, vai andando até chegar nele.
-                carro.andar() 
-                carro.calcMatriz()
-
-        glutPostRedisplay()
-
-=======
 
         posCameraDesejada = carro.posicao - carro.direcao * 0.1 + glm.vec3(0, 0, 0.05) #posição desejada da câmera, atrás do vetor direção self.carro.
         posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera        atual com a que deseja chegar.
@@ -226,7 +160,6 @@ class Utils():
         glutPostRedisplay()
 
 
->>>>>>> c8b7a45b06d4b9de3b9405c787d31b1d8d0506b7
     def main(self):
         global trajeto
         # Inicializa GLUT
@@ -247,17 +180,7 @@ class Utils():
         start_node = int(n1)
         end_node = int(n2)
         self.path = pathfinder.find_shortest_path(start_node, end_node)
-<<<<<<< HEAD
-
-        # Carro
-        #self.carro = Carro(self.posicao, self.direcao, self.lateral)
         self.create_path(self.nodes, self.path, self.bbox)
-        #self.carro.setarPosicaoInicio(glm.vec3([ 0.293644, 0.320556, 0 ]))
-        print(self.trajeto)
-        #self.carro.calculaProxDirec(self.trajeto[1])
-=======
-        self.create_path(self.nodes, self.path, self.bbox)
->>>>>>> c8b7a45b06d4b9de3b9405c787d31b1d8d0506b7
 
         carro.setarPosicaoInicio(*trajeto[vertice])
         carro.calculaProxDirec(trajeto[vertice+1])
@@ -265,7 +188,7 @@ class Utils():
         # Configurações do GLUT
         glutTimerFunc(int(1000/60), self.timer, 0)  
         glutDisplayFunc(self.display_callback)
-        glutTimerFunc(int(1000/60), self.timer, 0) # função 'timer' será chamada daqui a 1000/FPS milissegundos#]        glutIdleFunc(self.display_callback)
+        glutIdleFunc(self.display_callback)
         glutKeyboardFunc(self.keyboard_callback)
         glutSpecialFunc(self.special_callback)
 
