@@ -132,16 +132,17 @@ class Utils():
         #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução.
         glutTimerFunc(int(1000/60), self.timer, 0)  
 
-        #Atualizando a posição da câmera
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
+        if self.move: # Se o carro começar a andar, atualiza a câmera para ele.
+            #Atualizando a posição da câmera
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
 
-        posCameraDesejada = carro.posicao - carro.direcao * 0.1 + glm.vec3(0, 0, 0.05) #posição desejada da câmera, atrás do vetor direção self.carro.
-        posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera        atual com a que deseja chegar.
-        
-        gluLookAt(posCameraAtual.x, posCameraAtual.y, posCameraAtual.z,  #posição suavizada da câmera
-                    *carro.posicao,  # Ponto suavizado para o qual a câmera olha
-                    0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
+            posCameraDesejada = carro.posicao - carro.direcao * 0.1 + glm.vec3(0, 0, 0.05) #posição desejada da câmera, atrás do vetor direção self.carro.
+            posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera        atual com a que deseja chegar.
+            
+            gluLookAt(posCameraAtual.x, posCameraAtual.y, posCameraAtual.z,  #posição suavizada da câmera
+                        *carro.posicao,  # Ponto suavizado para o qual a câmera olha
+                        0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
         
         if vertice < len(trajeto):
             if(glm.distance(carro.posicao,trajeto[vertice]) < 0.004): #Ao chegar no vértice, recalcula para o outro.
