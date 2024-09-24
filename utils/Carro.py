@@ -1,15 +1,15 @@
 from OpenGL.GL import *
 import glm
 
-v1 = [-1,-1,0]
-v2 = [1,-1,0]
-v3 = [0,1,0]
-v4 = [-1,-1,0.50]
-v5 = [1,-1,0.50]
-v6 = [0,1,0.50]
+v1 = [-0.01,-0.01,0]
+v2 = [0.01,-0.01,0]
+v3 = [0,0.01,0]
+v4 = [-0.01,-0.01,0.0050]
+v5 = [0.01,-0.01,0.0050]
+v6 = [0,0.01,0.0050]
 M = glm.mat4(1)
-velocidade = 0.05
-vertices = [v1,v2,v3,v4,v5,v6]
+velocidade = 0.005
+trajeto = [v1,v2,v3,v4,v5,v6]
 
 class Carro:
     def __init__(self, posicao, direcao,lateral):
@@ -56,11 +56,11 @@ class Carro:
         
 
     def desenhar(self):
-        global v1,v2,v3,v4,v5,v6,vertices
+        global v1,v2,v3,v4,v5,v6,trajeto
         #Desenhando ao redor do triângulo..
         glColor3f(0,0.5,0.8)
         glBegin(GL_TRIANGLES)
-        for i in vertices:
+        for i in trajeto:
             glVertex3fv(i)
         glEnd()
 
@@ -89,7 +89,7 @@ class Carro:
         glColor3f(1,1,1)
 
         glBegin(GL_TRIANGLES)
-        for i in vertices:
+        for i in trajeto:
             glVertex3fv(i)
         glEnd()
 
