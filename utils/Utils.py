@@ -49,6 +49,49 @@ class Utils():
         glLoadIdentity()
         gluLookAt(0, 0, self.zoom, 0, 0, 0, 0, 1, 0)
 
+
+    def setup_lighting(self):
+        glEnable(GL_LIGHTING)  # Habilita o sistema de iluminação
+        glEnable(GL_LIGHT0)    # Habilita uma luz (Luz 0)
+
+        # Posiciona a luz ligeiramente à frente do carro, seguindo sua direção
+        light_position = [
+            carro.posicao.x + carro.direcao.x * 0.0001,  # Posição da luz à frente do carro na direção X
+            carro.posicao.y + carro.direcao.y * 0.0001,  # Posição da luz à frente do carro na direção Y
+            carro.posicao.z + 0.02,                   # Mantém a luz um pouco acima da posição do carro
+            1.0  # Componente w = 1.0 significa que é uma luz posicional
+        ]
+
+        # Definindo a luz como uma luz direcional à frente do carro
+        light_direction = [
+            carro.direcao.x * 0.1,  # Direção da luz na direção X do carro
+            carro.direcao.y * 0.1,  # Direção da luz na direção Y do carro
+            -0.1,  # Direcionada ligeiramente para baixo
+        ]
+
+        # Configura os parâmetros de iluminação: ambiente, difusa, e especular
+        light_ambient = [0.8, 0.8, 0.8, 1.0]   # Componente ambiente da luz
+        light_diffuse = [1.0, 1.0, 1.0, 1.0]   # Componente difusa
+        light_specular = [1.0, 1.0, 1.0, 1.0]  # Componente especular
+
+        # Aplicar os parâmetros de iluminação ao GL_LIGHT0
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position)  # Define a posição da luz
+        glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light_direction)  # Define a direção da luz
+        glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 30.0)  # Ângulo do feixe de luz (em graus)
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse)
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular)
+
+        # Configura o modelo de iluminação (luz ambiente global)
+        global_ambient = [0.9, 0.9, 0.9, 1.0]
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient)
+
+        # Habilita o uso de materiais
+        glEnable(GL_COLOR_MATERIAL)
+        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
+        glMaterialfv(GL_FRONT, GL_SPECULAR, [1.0, 1.0, 1.0, 1.0])  # Especular
+        glMateriali(GL_FRONT, GL_SHININESS, 64)  # Brilho especular
+
     def redimensionaJanela(self, w, h):
         global janelaLargura, janelaAltura
         janelaLargura = w
@@ -126,6 +169,9 @@ class Utils():
         glRotatef(self.rotation_x, 1, 0, 0)
         glRotatef(self.rotation_y, 0, 1, 0)
         glTranslatef(self.move_x, self.move_y, 0)
+
+        if(self.cam):
+            self.setup_lighting()
 
         # Desenha prédios e mapa
         draw_buildings_as_cubes(self.nodes, self.buiding, self.bbox)
