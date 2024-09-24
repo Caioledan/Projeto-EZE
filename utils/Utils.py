@@ -35,6 +35,7 @@ class Utils():
         self.nodes = None
         self.bbox = None
         self.path = None
+        self.cam = False
 
     def setup_3d_view(self):
         glMatrixMode(GL_PROJECTION)
@@ -85,6 +86,8 @@ class Utils():
             self.draw_min = not self.draw_min
         elif key == b'\r':
             self.move = not self.move
+        elif key == b'c':
+            self.cam = not self.cam
 
 
     def special_callback(self, key, x, y):
@@ -132,7 +135,7 @@ class Utils():
         #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução.
         glutTimerFunc(int(1000/60), self.timer, 0)  
 
-        if self.move: # Se o carro começar a andar, atualiza a câmera para ele.
+        if self.cam: # Se o carro começar a andar, atualiza a câmera para ele.
             #Atualizando a posição da câmera
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
