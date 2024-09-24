@@ -169,7 +169,7 @@ class Utils():
         glutInit()
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
         glutInitWindowSize(1080, 920)
-        glutCreateWindow(b"WAZE PROJECT")
+        glutCreateWindow(b"PROJETO EZE")
         glClearColor(39.0 / 255.0, 45.0 / 255.0, 57.0 / 255.0, 1.0)
         self.setup_3d_view()
 
