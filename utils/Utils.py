@@ -14,10 +14,14 @@ posCameraAtual = glm.vec3(0, 0, 0.02)
 suavizacaoCamera = 0.1  #variavel para a suavização
 vertice = 0
 trajeto = []
+trajeto1 = []
 
 posicao = glm.vec3(0,0,0) #posição do self.carro
 direcao = glm.vec3(0,1,0) #vetor direção no eixo y
 lateral = glm.vec3(1,0,0) #vetor lateral no eixo x
+
+janelaLargura = 1000
+janelaAltura = 800
 
 carro = Carro(posicao, direcao, lateral)
 
@@ -40,11 +44,17 @@ class Utils():
     def setup_3d_view(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        # gluPerspective(90, 800 / 600, 0.1, 100.0)
-        gluPerspective(90, 800 / 600, 0.05, 500.0)
+        gluPerspective(90, 800 / 600, 0.02, 500.0)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         gluLookAt(0, 0, self.zoom, 0, 0, 0, 0, 1, 0)
+
+    def redimensionaJanela(self, w, h):
+        global janelaLargura, janelaAltura
+        janelaLargura = w
+        janelaAltura = h
+        glViewport(0,0, w, h)
+        glutPostRedisplay()
 
 
     def read_osm(self, filename):
@@ -55,8 +65,7 @@ class Utils():
         bbox = (min(lats), min(lons), max(lats), max(lons))
         return handler.nodes, handler.ways, handler.buildings, handler.graph, bbox
 
-    def create_path(self, nodes, path, bbox):
-        global trajeto
+    def create_path(self, nodes, path, bbox, trajeto):
         for i in range(len(path) - 1):
             node1 = nodes[path[i]]
             node2 = nodes[path[i + 1]]
@@ -67,6 +76,7 @@ class Utils():
 
 
     def keyboard_callback(self, key, x, y):
+        global trajeto
         # Controle de rotação, zoom e movimento
         if key == b'\x1b':  # Tecla ESC para sair
             glutLeaveMainLoop()
@@ -83,7 +93,17 @@ class Utils():
         elif key == b'-':
             self.zoom += 0.1
         elif key == b' ':
-            self.draw_min = not self.draw_min
+            if not self.path:  # Só cria o caminho se ainda não existir
+                random = Randomic()
+                pathfinder = PathFinder(self.graph, self.nodes)
+                n1, n2 = random.randomizer()
+                start_node = int(n1)
+                end_node = int(n2)
+                self.path = pathfinder.find_shortest_path(start_node, end_node)
+                self.create_path(self.nodes, self.path, self.bbox, trajeto)
+                carro.setarPosicaoInicio(*trajeto[vertice])
+                carro.calculaProxDirec(trajeto[vertice+1])
+            self.draw_min = not self.draw_min  # Alterna entre desenhar ou não o caminho
         elif key == b'\r':
             self.move = not self.move
         elif key == b'c':
@@ -117,13 +137,13 @@ class Utils():
             draw_path(self.nodes, self.path, self.bbox)
             glEnable(GL_DEPTH_TEST)
 
-        # Desenha o self.carro
-        glLineWidth(0.01)
-        glPushMatrix()
-        # glScale(0.01,0.01,0.02)
-        glMultMatrixf(np.asarray(glm.transpose(M))) # função que aplica uma matriz qualquer no objeto
-        carro.desenhar()
-        glPopMatrix()
+        # Desenha o carro apenas se o trajeto foi traçado
+        if len(trajeto) > 1:  # Verifica se o trajeto foi gerado
+            glLineWidth(0.01)
+            glPushMatrix()
+            glMultMatrixf(np.asarray(glm.transpose(M)))  # função que aplica uma matriz qualquer no objeto
+            carro.desenhar()
+            glPopMatrix()
 
         glutSwapBuffers()
 
@@ -179,16 +199,6 @@ class Utils():
         # Configuração do mapa
         filename = "data/map.osm"
         self.nodes, self.ways, self.buiding, self.graph, self.bbox = self.read_osm(filename)
-        random = Randomic()
-        pathfinder = PathFinder(self.graph, self.nodes)
-        n1, n2 = random.randomizer()
-        start_node = int(n1)
-        end_node = int(n2)
-        self.path = pathfinder.find_shortest_path(start_node, end_node)
-        self.create_path(self.nodes, self.path, self.bbox)
-
-        carro.setarPosicaoInicio(*trajeto[vertice])
-        carro.calculaProxDirec(trajeto[vertice+1])
         
         # Configurações do GLUT
         glutTimerFunc(int(1000/60), self.timer, 0)  
@@ -196,6 +206,7 @@ class Utils():
         glutIdleFunc(self.display_callback)
         glutKeyboardFunc(self.keyboard_callback)
         glutSpecialFunc(self.special_callback)
+        glutReshapeFunc(self.redimensionaJanela)
 
         # Loop principal
         glutMainLoop()
