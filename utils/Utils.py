@@ -39,6 +39,7 @@ class Utils():
     def setup_3d_view(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
+        # gluPerspective(90, 800 / 600, 0.1, 100.0)
         gluPerspective(90, 800 / 600, 0.05, 500.0)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
@@ -143,7 +144,7 @@ class Utils():
                     0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
         
         if vertice < len(trajeto):
-            if(glm.distance(carro.posicao,trajeto[vertice]) < 0.008): #Ao chegar no vértice, recalcula para o outro.
+            if(glm.distance(carro.posicao,trajeto[vertice]) < 0.004): #Ao chegar no vértice, recalcula para o outro.
                 if(trajeto[vertice] != trajeto[len(trajeto)-1]): #O self.carro só vai andar até ele chegar no último vértice
                     vertice = vertice + 1  #Incrementa para pegar o proximo vertice do trajeto
                     if self.move:
@@ -156,7 +157,6 @@ class Utils():
                 if self.move:
                     carro.andar() #Coloco o self.carro para andar
                     carro.calcMatriz() #E calculo a matriz de transformação.
-
 
 
         glutPostRedisplay()
