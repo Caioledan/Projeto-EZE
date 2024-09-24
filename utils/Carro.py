@@ -8,7 +8,7 @@ v4 = [-0.01,-0.01,0.0050]
 v5 = [0.01,-0.01,0.0050]
 v6 = [0,0.01,0.0050]
 M = glm.mat4(1)
-velocidade = 0.005
+velocidade = 0.002
 trajeto = [v1,v2,v3,v4,v5,v6]
 
 class Carro:
@@ -36,9 +36,15 @@ class Carro:
     def andar(self):
         self.posicao = self.posicao + velocidade*self.direcao
 
+
     def calculaProxDirec(self,vertice):
-        vetorVertCarro = glm.normalize(vertice - self.posicao)#Vetor que sai do carro até o vertice e normalizo ele.
+        vetorVertCarro = vertice - self.posicao#Vetor que sai do carro até o vertice e normalizo ele.
+
+        if glm.length(vetorVertCarro) > 0:
+            vetorVertCarro = glm.normalize(vetorVertCarro)
+
         escalar = glm.dot(self.direcao,vetorVertCarro) #Vai me voltar o cosseno desses angulos
+        escalar = glm.clamp(escalar, -1.0, 1.0)  # Garantir que o valor esteja no intervalo correto
         angulo = glm.acos(escalar) #Uso a função para pegar o angulo desse cosseno.
 
         #Faço produto vetorial entre os dois vetores para saber a direção deles.
