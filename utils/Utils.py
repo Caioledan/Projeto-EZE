@@ -39,7 +39,7 @@ class Utils():
     def setup_3d_view(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(90, 800 / 600, 0.1, 100.0)
+        gluPerspective(90, 800 / 600, 0.05, 500.0)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         gluLookAt(0, 0, self.zoom, 0, 0, 0, 0, 1, 0)
