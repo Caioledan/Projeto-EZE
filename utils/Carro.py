@@ -8,7 +8,7 @@ v4 = [-1,-1,0.50]
 v5 = [1,-1,0.50]
 v6 = [0,1,0.50]
 M = glm.mat4(1)
-velocidade = 0.05
+velocidade = 0.1
 vertices = [v1,v2,v3,v4,v5,v6]
 
 class Carro:
@@ -19,12 +19,14 @@ class Carro:
         self.velocidade = velocidade
 
 
-    def setarPosicaoInicio(self, x,y,z):
-        self.posicao.x = x
-        self.posicao.y = y
-        self.posicao.z = z
+    def setarPosicaoInicio(self, coordenada):
+        self.posicao.x = coordenada.x
+        self.posicao.y = coordenada.y
+        self.posicao.z = coordenada.z
         self.calcMatriz()
 
+
+#  0.58844, 0.428251, 0 
 
     def calcMatriz(self):
         global M
