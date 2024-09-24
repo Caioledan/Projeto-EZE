@@ -10,7 +10,7 @@ v6 = [0,0.01,0.0050]
 M = glm.mat4(1)
 velocidade = 0.002
 trajeto = [v1,v2,v3,v4,v5,v6]
-
+#
 class Carro:
     def __init__(self, posicao, direcao,lateral):
         self.posicao = posicao

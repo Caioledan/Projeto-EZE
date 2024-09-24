@@ -8,7 +8,7 @@ from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth, draw_pa
 from utils.PathFinder import PathFinder
 from utils.randomicc import Randomic
 from utils.Carro import *
-
+#
 #variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
 posCameraAtual = glm.vec3(0, 0, 0.02)
 suavizacaoCamera = 0.1  #variavel para a suavização
