@@ -82,7 +82,7 @@ class Utils():
             self.zoom += 0.1
         elif key == b' ':
             self.draw_min = not self.draw_min
-        elif key == b'0':
+        elif key == b'\r':
             self.move = not self.move
 
 
@@ -146,14 +146,16 @@ class Utils():
             if(glm.distance(carro.posicao,trajeto[vertice]) < 0.008): #Ao chegar no vértice, recalcula para o outro.
                 if(trajeto[vertice] != trajeto[len(trajeto)-1]): #O self.carro só vai andar até ele chegar no último vértice
                     vertice = vertice + 1  #Incrementa para pegar o proximo vertice do trajeto
-                    carro.calculaProxDirec(trajeto[vertice]) #Calculo a direção dele
-                    carro.andar() #Coloco o self.carro para andar
-                    carro.calcMatriz() #E calculo a matriz de transformação.
+                    if self.move:
+                        carro.calculaProxDirec(trajeto[vertice]) #Calculo a direção dele
+                        carro.andar() #Coloco o self.carro para andar
+                        carro.calcMatriz() #E calculo a matriz de transformação.
                 else:
                     pass #Quando estiver no último vértice, o self.carro para.
             else:#Se não estiver perto do outro vértice, vai andando até chegar nele
-                carro.andar() #Coloco o self.carro para andar
-                carro.calcMatriz() #E calculo a matriz de transformação.
+                if self.move:
+                    carro.andar() #Coloco o self.carro para andar
+                    carro.calcMatriz() #E calculo a matriz de transformação.
 
 
 
@@ -173,7 +175,6 @@ class Utils():
         # Configuração do mapa
         filename = "data/map.osm"
         self.nodes, self.ways, self.buiding, self.graph, self.bbox = self.read_osm(filename)
-        print(self.bbox)
         random = Randomic()
         pathfinder = PathFinder(self.graph, self.nodes)
         n1, n2 = random.randomizer()
