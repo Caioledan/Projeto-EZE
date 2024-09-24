@@ -17,6 +17,7 @@ class Carro:
         self.direcao = direcao
         self.lateral = lateral
         self.velocidade = velocidade
+        self.M = M
 
 
     def setarPosicaoInicio(self, x,y,z):
@@ -25,13 +26,13 @@ class Carro:
         self.posicao.z = z
         self.calcMatriz()
 
-
     def calcMatriz(self):
         global M
         M[0] = glm.vec4(self.lateral,0) #1 COLUNA VETOR I, lateral do carro
         M[1] = glm.vec4(self.direcao,0) #2 COLUNA VETOR J, direção do carro
         M[2] = glm.vec4(0,0,1,0) #3 COLUNA VETOR K, topo do carro eixo z
         M[3] = glm.vec4(self.posicao,1) #4 COLUNA POSICAO DO CARRO
+
 
     def andar(self):
         self.posicao = self.posicao + velocidade*self.direcao

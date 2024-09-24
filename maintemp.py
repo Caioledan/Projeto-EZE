@@ -63,9 +63,10 @@ def inicio():
     glEnable(GL_DEPTH_TEST)  # Habilita o teste de profundidade
 
 
+
 vertice = 0 #Variável que vai dizer o índice do vertice na lista para o carro andar.
-carro.setarPosicaoInicio(-10,-5,0) #Seto o carro com uma posição inicial
-carro.calculaProxDirec(trajeto[vertice]) #E faço ele ficar em direção ao vértice do trajeto.
+carro.setarPosicaoInicio(*trajeto[vertice]) #Seto o carro com uma posição inicial
+carro.calculaProxDirec(trajeto[vertice+1]) #E faço ele ficar em direção ao vértice do trajeto.
 
 #variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
 posCameraAtual = glm.vec3(0, 0, 5)
@@ -79,6 +80,7 @@ def timer(v):
     #Atualizando a posição da câmera
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
+    
     posCameraDesejada = carro.posicao - carro.direcao + glm.vec3(0, 0, 0.75) #posição desejada da câmera, atrás do vetor direção carro.
     posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera atual com a que deseja chegar.
 
