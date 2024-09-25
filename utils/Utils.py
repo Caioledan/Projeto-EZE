@@ -4,17 +4,18 @@ from OpenGL.GLUT import *
 import glm
 import numpy as np
 from utils.OSMHandlerConvert import OSMHandler, latlon_to_opengl
-from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth, draw_path
+from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth, draw_path, draw_pre_path
 from utils.PathFinder import PathFinder
-from utils.randomicc import Randomic
+from utils.randomic import Randomic
 from utils.Carro import *
+from map_data import paths
 
 #variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
 posCameraAtual = glm.vec3(0, 0, 0.02)
 suavizacaoCamera = 0.1  #variavel para a suavização
 vertice = 0
 trajeto = []
-trajeto1 = []
+
 
 posicao = glm.vec3(0,0,0) #posição do self.carro
 direcao = glm.vec3(0,1,0) #vetor direção no eixo y
@@ -40,6 +41,8 @@ class Utils():
         self.bbox = None
         self.path = None
         self.cam = False
+        self.pre = False
+        self.pre_true = False
 
     def setup_3d_view(self):
         glMatrixMode(GL_PROJECTION)
@@ -147,6 +150,34 @@ class Utils():
                 carro.setarPosicaoInicio(*trajeto[vertice])
                 carro.calculaProxDirec(trajeto[vertice+1])
             self.draw_min = not self.draw_min  # Alterna entre desenhar ou não o caminho
+        elif key == b'1':
+            if not self.pre_true:
+                trajeto = paths.routes["route1"]
+                carro.setarPosicaoInicio(*trajeto[vertice])
+                carro.calculaProxDirec(trajeto[vertice+1])
+                self.pre_true = True
+            self.pre = not self.pre
+        elif key == b'2':
+            if not self.pre_true:
+                trajeto = paths.routes["route2"]
+                carro.setarPosicaoInicio(*trajeto[vertice])
+                carro.calculaProxDirec(trajeto[vertice+1])
+                self.pre_true = True
+            self.pre = not self.pre
+        elif key == b'3':
+            if not self.pre_true:
+                trajeto = paths.routes["route3"]
+                carro.setarPosicaoInicio(*trajeto[vertice])
+                carro.calculaProxDirec(trajeto[vertice+1])
+                self.pre_true = True
+            self.pre = not self.pre
+        elif key == b'4':
+            if not self.pre_true:
+                trajeto = paths.routes["route4"]
+                carro.setarPosicaoInicio(*trajeto[vertice])
+                carro.calculaProxDirec(trajeto[vertice+1])
+                self.pre_true = True
+            self.pre = not self.pre
         elif key == b'\r':
             self.move = not self.move
         elif key == b'c':
@@ -181,6 +212,11 @@ class Utils():
         if self.draw_min:
             glDisable(GL_DEPTH_TEST)
             draw_path(self.nodes, self.path, self.bbox)
+            glEnable(GL_DEPTH_TEST)
+
+        if self.pre:
+            glDisable(GL_DEPTH_TEST)
+            draw_pre_path(trajeto)
             glEnable(GL_DEPTH_TEST)
 
         # Desenha o carro apenas se o trajeto foi traçado

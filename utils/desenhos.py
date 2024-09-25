@@ -64,12 +64,10 @@ def draw_map_with_depth(nodes, ways, bbox, street_width=0.001, depth=0.001):
     glEnd()
 
 
-# Função para desenhar prédios com profundidade (como prismas)
-# Função para desenhar prédios no formato de cubos
 # Função para desenhar o caminho em rosa
-def draw_path(nodes, path, bbox, street_width=5):
+def draw_path(nodes, path, bbox):
     glColor3f(40.0/255.0, 224.0/255.0, 254.0/255.0)  # Cor vermelha para o caminho
-    glLineWidth(street_width)  # Largura da linha para destacar o caminho
+    glLineWidth(5)  # Largura da linha para destacar o caminho
     glBegin(GL_LINES)
 
 
@@ -86,8 +84,15 @@ def draw_path(nodes, path, bbox, street_width=5):
 
     glEnd()
 
+def draw_pre_path(trajeto):
+    glColor3f(40.0/255.0, 224.0/255.0, 254.0/255.0)
+    glLineWidth(5)
+    glBegin(GL_LINES)
 
+    for i in trajeto:
+        glVertex3f(*i)
 
+    glEnd()
 
 
 def draw_buildings_as_cubes(nodes, buildings, bbox, building_width=0.0001, building_height=0.003):
