@@ -12,6 +12,7 @@ from utils.pontosInteresse import pontos
 from map_data import paths
 
 
+
 #variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
 posCameraAtual = glm.vec3(0, 0, 0.02)
 suavizacaoCamera = 0.1  #variavel para a suavização
@@ -34,12 +35,13 @@ point2 = pontos()
 texId1 = 0
 texId2 = 0
 
+zoom = 1
 class Utils():
     def __init__(self):
         # Variáveis globais
+        #constantes
         self.rotation_x = 0
         self.rotation_y = 0
-        self.zoom = 1
         self.move_x = 0
         self.move_y = 0
         self.move_speed = 0.1
@@ -51,14 +53,17 @@ class Utils():
         self.cam = False
         self.pre = False
         self.pre_true = False
+        self.original_position = False
+
 
     def setup_3d_view(self):
+        global zoom
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(90, 800 / 600, 0.02, 500.0)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        gluLookAt(0, 0, self.zoom, 0, 0, 0, 0, 1, 0)
+        gluLookAt(0, 0, zoom, 0, 0, 0, 0, 1, 0)
 
 
     def setup_lighting(self):
@@ -130,7 +135,7 @@ class Utils():
 
 
     def keyboard_callback(self, key, x, y):
-        global trajeto
+        global trajeto, zoom
         # Controle de rotação, zoom e movimento
         if key == b'\x1b':  # Tecla ESC para sair
             glutLeaveMainLoop()
@@ -143,9 +148,9 @@ class Utils():
         elif key == b'd':
             self.move_x -= self.move_speed
         elif key == b'=':
-            self.zoom -= 0.1
+            zoom -= 0.1
         elif key == b'-':
-            self.zoom += 0.1
+            zoom += 0.1
         elif key == b' ':
             if not self.path:  # Só cria o caminho se ainda não existir
                 random = Randomic()
@@ -190,6 +195,8 @@ class Utils():
             self.move = not self.move
         elif key == b'c':
             self.cam = not self.cam
+        elif key == b'r':
+            self.original_position = not self.original_position
 
 
     def special_callback(self, key, x, y):
@@ -206,13 +213,21 @@ class Utils():
         global texId1, texId2
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        
-        glRotatef(self.rotation_x, 1, 0, 0)
-        glRotatef(self.rotation_y, 0, 1, 0)
-        glTranslatef(self.move_x, self.move_y, 0)
 
         if(self.cam):
             self.setup_lighting()
+        
+        else:
+            self.setup_3d_view()
+        
+        if(not self.original_position):
+            glRotatef(self.rotation_x, 1, 0, 0)
+            glRotatef(self.rotation_y, 0, 1, 0)
+            glTranslatef(self.move_x, self.move_y, 0)
+        else:
+            glRotatef(0, 1, 0, 0)
+            glRotatef(0, 0, 1, 0)
+            glTranslatef(0, 0, 0)
 
         # Desenha prédios e mapa
         draw_buildings_as_cubes(self.nodes, self.buiding, self.bbox)
@@ -275,6 +290,7 @@ class Utils():
                         *carro.posicao,  # Ponto suavizado para o qual a câmera olha
                         0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
         
+
         if vertice < len(trajeto):
             if(glm.distance(carro.posicao,trajeto[vertice]) < 0.004): #Ao chegar no vértice, recalcula para o outro.
                 if(trajeto[vertice] != trajeto[len(trajeto)-1]): #O self.carro só vai andar até ele chegar no último vértice
@@ -302,7 +318,7 @@ class Utils():
         glutInitWindowSize(1080, 920)
         glutCreateWindow(b"PROJETO EZE")
         glClearColor(39.0 / 255.0, 45.0 / 255.0, 57.0 / 255.0, 1.0)
-        self.setup_3d_view()
+        #self.setup_3d_view()
 
         glEnable(GL_TEXTURE_2D)
         texId1 = point1.sortearTextura()
