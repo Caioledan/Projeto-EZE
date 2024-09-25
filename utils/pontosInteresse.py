@@ -76,7 +76,7 @@ class pontos:
         glPushMatrix()
 
         self.angulo += 5 # Fator que definirá a velocidade de rotação
-        self.desloc = 0.003 * sin(self.angulo * pi/180) # Usando o fator 0.003 multiplicando a função seno, o movimento se torna suave no eixo z
+        self.desloc = 0.003 * sin(self.angulo * pi/180) # Usando o fator 0.003 multiplicando a função seno, o movimento vertical se torna suave no eixo z
         glTranslate(0,0,self.desloc) # Função que faz o ícone ter um movimento suave para cima e para baixo
 
         glRotate(self.angulo, 0, 0, 1) # Função que faz o ícone rotacionar em torno de si mesmo, no eixo z

@@ -58,18 +58,18 @@ def draw_map_with_depth(nodes, ways, bbox, street_width=0.001, depth=0.001):
     glEnd()
 
 
-# Função para desenhar o caminho em rosa
-def draw_path(nodes, path, bbox):
-    glColor3f(40.0/255.0, 224.0/255.0, 254.0/255.0)  # Cor vermelha para o caminho
+# Função para desenhar o caminho em ciano
+def draw_path(nodes, path, bbox): # O código recebe a lista de vértices do mapa, as IDs de vértices utilizadas no caminho e as coordenadas de mapa bbox
+    glColor3f(40.0/255.0, 224.0/255.0, 254.0/255.0)  # Cor ciano para o caminho
     glLineWidth(5)  # Largura da linha para destacar o caminho
     glBegin(GL_LINES)
 
 
-    for i in range(len(path) - 1):
-        node1 = nodes[path[i]]
-        node2 = nodes[path[i + 1]]
+    for i in range(len(path) - 1): # Para cada ID de vértice no caminho ele irá:
+        node1 = nodes[path[i]] # Receber em uma variável o vértice ligado ao ID no path
+        node2 = nodes[path[i + 1]] # Faz o mesmo porém para verificar o próximo vértice
 
-        x1, y1, z1 = latlon_to_opengl(node1[0], node1[1], bbox, z=0)
+        x1, y1, z1 = latlon_to_opengl(node1[0], node1[1], bbox, z=0) # Faz a normalização das coordenadas do osm para as coordenadas do OpenGl
         x2, y2, z2 = latlon_to_opengl(node2[0], node2[1], bbox, z=0)
 
         # Desenha uma linha entre os dois nós
@@ -78,11 +78,13 @@ def draw_path(nodes, path, bbox):
 
     glEnd()
 
+# Função para desenhar um caminho pre-setado em ciano
 def draw_pre_path(trajeto):
     glColor3f(40.0/255.0, 224.0/255.0, 254.0/255.0)
     glLineWidth(5)
     glBegin(GL_LINES)
 
+    # Utiliza a mesma lógica de draw_path porém com coordenadas de vértices ao invés de IDs de vértices
     for i in trajeto:
         glVertex3f(*i)
 

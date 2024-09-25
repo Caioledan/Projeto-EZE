@@ -13,7 +13,8 @@ from map_data import paths
 
 
 
-#variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
+#Variáveis globais
+
 posCameraAtual = glm.vec3(0, 0, 0.02)
 suavizacaoCamera = 0.1  #variavel para a suavização
 vertice = 0
@@ -114,26 +115,6 @@ class Utils():
         glMaterialfv(GL_FRONT, GL_SPECULAR, [1.0, 1.0, 1.0, 1.0])  # Especular
         glMateriali(GL_FRONT, GL_SHININESS, 64)  # Brilho especular
 
-    def redimensionaJanela(self, w, h):
-        global janelaLargura, janelaAltura
-        janelaLargura = w
-        janelaAltura = h
-        
-        # Evita divisão por zero se a altura for muito pequena
-        if h == 0:
-            h = 1
-        
-        # Ajusta a viewport ao novo tamanho da janela
-        glViewport(0, 0, w, h)
-        
-        # Ajusta a projeção de perspectiva
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        aspect_ratio = w / h
-        gluPerspective(45.0, aspect_ratio, 0.1, 100.0)
-        
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
 
     #Leitura do arquivo do mapa
     def read_osm(self, filename):
@@ -144,7 +125,7 @@ class Utils():
         bbox = (min(lats), min(lons), max(lats), max(lons))
         return handler.nodes, handler.ways, handler.buildings, handler.graph, bbox
 
-    def create_path(self, nodes, path, bbox, trajeto):
+    def create_path(self, nodes, path, bbox, trajeto): # Função que cria o trajeto, adicionando os vértices de desenho em uma lista
         for i in range(len(path) - 1):
             node1 = nodes[path[i]]
             node2 = nodes[path[i + 1]]
@@ -175,15 +156,15 @@ class Utils():
             if not self.path:  # Só cria o caminho se ainda não existir
                 random = Randomic()
                 pathfinder = PathFinder(self.graph, self.nodes)
-                n1, n2 = random.randomizer()
-                start_node = int(n1)
-                end_node = int(n2)
-                self.path = pathfinder.find_shortest_path(start_node, end_node)
-                self.create_path(self.nodes, self.path, self.bbox, trajeto)
-                carro.setarPosicaoInicio(*trajeto[vertice])
-                carro.calculaProxDirec(trajeto[vertice+1])
+                n1, n2 = random.randomizer() # Variáveis que recebem IDs de vértices aleatórios
+                start_node = int(n1) # Define o primeiro vértice como inicial
+                end_node = int(n2) # Define o segundo vértice como final
+                self.path = pathfinder.find_shortest_path(start_node, end_node) # Criará a lista de IDs de vértices
+                self.create_path(self.nodes, self.path, self.bbox, trajeto) # Criará o caminho mínimo
+                carro.setarPosicaoInicio(*trajeto[vertice]) # Definirá a posição inicial do carro no vértice de início
+                carro.calculaProxDirec(trajeto[vertice+1]) # Calcula para onde o carro irá
             self.draw_min = not self.draw_min  # Alterna entre desenhar ou não o caminho
-        elif key == b'1':
+        elif key == b'1': # Funções para desenhar e fazer o carro andar em caminhos pré-setados
             if not self.pre_true:
                 trajeto = paths.routes["route1"]
                 carro.setarPosicaoInicio(*trajeto[vertice])
@@ -211,11 +192,11 @@ class Utils():
                 carro.calculaProxDirec(trajeto[vertice+1])
                 self.pre_true = True
             self.pre = not self.pre
-        elif key == b'\r':
+        elif key == b'\r': # Faz o carro andar ao apertar ENTER
             self.move = not self.move
-        elif key == b'c':
+        elif key == b'c': # Define a câmera atrás e acima do carro, apontando para ele
             self.cam = not self.cam
-        elif key == b'r':
+        elif key == b'r': # Depois de movimentar a câmera, redefine para evitar bugs de câmera
             self.original_position = not self.original_position
 
 
@@ -254,12 +235,12 @@ class Utils():
         draw_map_with_depth(self.nodes, self.ways, self.bbox)
 
         # Desenha o caminho se a tecla espaço foi apertada
-        if self.draw_min:
+        if self.draw_min: # Faz o desenho do caminho aparecer ou sumir no mapa
             glDisable(GL_DEPTH_TEST)
             draw_path(self.nodes, self.path, self.bbox)
             glEnable(GL_DEPTH_TEST)
 
-        if self.pre:
+        if self.pre: # Faz o desenho do caminho aparecer ou sumir no mapa
             glDisable(GL_DEPTH_TEST)
             draw_pre_path(trajeto)
             glEnable(GL_DEPTH_TEST)
@@ -268,23 +249,23 @@ class Utils():
         if len(trajeto) > 1:  # Verifica se o trajeto foi gerado
             glLineWidth(0.01)
             glPushMatrix()
-            glMultMatrixf(np.asarray(glm.transpose(M)))  # função que aplica uma matriz qualquer no objeto
-            carro.desenhar()
+            glMultMatrixf(np.asarray(glm.transpose(M)))  # Função que aplica uma matriz qualquer no objeto
+            carro.desenhar() # Desenha o carro
             glPopMatrix()
 
         # Aplicando as texturas 
-        if(len(trajeto)):
-            loc = int((len(trajeto)/2.0))
+        if(len(trajeto)): # Se já existe o trajeto: 
+            loc = int((len(trajeto)/2.0)) # Variável que guarda o meio do caminho
 
-            glBindTexture(GL_TEXTURE_2D, texId1)
+            glBindTexture(GL_TEXTURE_2D, texId1) # Chama a textura do primeiro ponto
             glPushMatrix()
-            glTranslatef(trajeto[loc].x,trajeto[loc].y,trajeto[loc].z + 0.02)  # translação do círculo
-            point1.desenhar()
+            glTranslatef(trajeto[loc].x,trajeto[loc].y,trajeto[loc].z + 0.02)  # Translação do ícone para o meio do caminho e um pouco acima do mapa
+            point1.desenhar() # Desenho do ícone
             glPopMatrix()
-            glBindTexture(GL_TEXTURE_2D, texId2)
+            glBindTexture(GL_TEXTURE_2D, texId2) # Chama a textura do segundo ponto
             glPushMatrix()
-            glTranslate(trajeto[int(loc * 1.5)].x, trajeto[int(loc * 1.5)].y, trajeto[int(loc * 1.5)].z + 0.02)
-            point2.desenhar()
+            glTranslate(trajeto[int(loc * 1.5)].x, trajeto[int(loc * 1.5)].y, trajeto[int(loc * 1.5)].z + 0.02) # Translação do ícone para 75% do caminho e um pouco acima do mapa
+            point2.desenhar() # Desenho do segundo ícone
             glPopMatrix()
             glBindTexture(GL_TEXTURE_2D, 0)  # desassociar a textura
             
@@ -328,12 +309,12 @@ class Utils():
 
         if len(trajeto) > 0:
             glPushMatrix()
-            loc = int((len(trajeto)/2.0))
+            loc = int((len(trajeto)/2.0)) # Variável que guarda o local do meio do caminho
             if glm.distance(carro.posicao, trajeto[loc]) < 0.04:  # Verifica se o carro está próximo ao ponto
-                point1.pulsar()
-            glPopMatrix()
-            if glm.distance(carro.posicao, trajeto[int(loc *1.5)]) < 0.04:
+                point1.pulsar() # Chama a função que faz o ícone pulsar quando o carro chega perto
+            if glm.distance(carro.posicao, trajeto[int(loc *1.5)]) < 0.04: # Faz a mesma coisa para o ícone 2, porém no local que representa 75% do caminho
                 point2.pulsar()
+            glPopMatrix()
 
         glutPostRedisplay()
 
@@ -349,7 +330,7 @@ class Utils():
         #self.setup_3d_view()
 
         glEnable(GL_TEXTURE_2D)
-        texId1 = point1.sortearTextura()
+        texId1 = point1.sortearTextura() # Função que faz a ligação de uma textura a um objeto
         texId2 = point2.sortearTextura()
         while(True):
             texId2 = point2.sortearTextura()
@@ -366,7 +347,6 @@ class Utils():
         glutIdleFunc(self.display_callback)
         glutKeyboardFunc(self.keyboard_callback)
         glutSpecialFunc(self.special_callback)
-        glutReshapeFunc(self.redimensionaJanela)
 
         # Loop principal
         glutMainLoop()
