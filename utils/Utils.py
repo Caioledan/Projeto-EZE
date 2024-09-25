@@ -8,7 +8,9 @@ from utils.desenhos import draw_buildings_as_cubes, draw_map_with_depth, draw_pa
 from utils.PathFinder import PathFinder
 from utils.randomic import Randomic
 from utils.Carro import *
+from utils.pontosInteresse import pontos
 from map_data import paths
+
 
 #variáveis globais para armazenar a posição da câmera atual da camera e o seu alvo.
 posCameraAtual = glm.vec3(0, 0, 0.02)
@@ -25,6 +27,10 @@ janelaLargura = 1000
 janelaAltura = 800
 
 carro = Carro(posicao, direcao, lateral)
+
+# Chamada para a textura
+points = pontos()
+texId = 0
 
 class Utils():
     def __init__(self):
@@ -181,6 +187,7 @@ class Utils():
         elif key == b'\r':
             self.move = not self.move
         elif key == b'c':
+            print("ENTREI")
             self.cam = not self.cam
 
 
@@ -195,6 +202,8 @@ class Utils():
             self.rotation_x += 1
 
     def display_callback(self):
+        global texId
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
         glRotatef(self.rotation_x, 1, 0, 0)
@@ -227,8 +236,18 @@ class Utils():
             carro.desenhar()
             glPopMatrix()
 
-        glutSwapBuffers()
+        # Aplicando as texturas 
+        if(len(trajeto)):
+            loc = int((len(trajeto)/2.0))
 
+            glBindTexture(GL_TEXTURE_2D, texId)
+            glPushMatrix()
+            glTranslatef(trajeto[loc].x,trajeto[loc].y,trajeto[loc].z + 0.02)  # translação do círculo
+            points.desenhar()
+            glPopMatrix()
+            glBindTexture(GL_TEXTURE_2D, 0)  # desassociar a textura
+
+        glutSwapBuffers()
 
 
     def timer(self,v):
@@ -269,7 +288,7 @@ class Utils():
 
 
     def main(self):
-        global trajeto
+        global trajeto, texId
         # Inicializa GLUT
         glutInit()
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
@@ -277,6 +296,9 @@ class Utils():
         glutCreateWindow(b"PROJETO EZE")
         glClearColor(39.0 / 255.0, 45.0 / 255.0, 57.0 / 255.0, 1.0)
         self.setup_3d_view()
+
+        glEnable(GL_TEXTURE_2D)
+        texId = points.sortearTextura()
 
         # Configuração do mapa
         filename = "data/map.osm"
