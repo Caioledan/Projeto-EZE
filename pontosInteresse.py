@@ -17,6 +17,8 @@ class pontos:
         self.raio = raio
         self.lados = lados
 
+
+
     # Função responsável por carregar uma textura a partir do nome do arquivo
     def carregaTextura(self,filename):
         # carregamento da textura feita pelo módulo PIL

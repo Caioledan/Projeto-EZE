@@ -5,14 +5,10 @@ import glm
 from Carro import *
 import numpy as np
 from pontosInteresse import *
-from pontosInteresse import *
 
 posicao = glm.vec3(0,0,0) #posição do carro
 direcao = glm.vec3(0,1,0) #vetor direção no eixo y
 lateral = glm.vec3(1,0,0) #vetor lateral no eixo x
-
-
-
 
 
 trajeto = [glm.vec3(2,2,0),
