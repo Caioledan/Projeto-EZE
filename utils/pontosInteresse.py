@@ -3,9 +3,7 @@ from PIL import Image
 from math import pi,cos,sin
 from random import randint
 
-raio = 0.005
-lados = 100
-
+#caminhos para as texturas
 textura1 = "utils/textures/acidente.png"
 textura2 = "utils/textures/radar.png"
 textura3 = "utils/textures/policia.png"
@@ -14,11 +12,11 @@ textura4 = "utils/textures/buraco.png"
 
 class pontos:
     def __init__(self,raio,lados):
-        self.raio = raio
-        self.lados = lados
+        self.raio = raio #raio em que o circulo da figura será desenhado.
+        self.lados = lados #a qtd de lados da figura
         self.angulo = 0
         self.desloc = 0
-        self.expandindo = True
+        self.expandindo = True #variável para ajudar no pulsar
 
 
 
@@ -71,8 +69,6 @@ class pontos:
     
 
     def desenhar(self):
-        global raio,lados
-
         glPushMatrix()
 
         self.angulo += 5 # Fator que definirá a velocidade de rotação
@@ -84,8 +80,8 @@ class pontos:
         glBegin(GL_TRIANGLE_FAN)
         glTexCoord2f(0.5, 0.5)  #Começo colocando o meio da coordenada de textura da imagem no meio da figura do circulo.
         glVertex3f(0,0, 0)  
-        for i in range(lados + 1):
-            angle = 2.0 * pi * i /lados
+        for i in range(self.lados + 1):
+            angle = 2.0 * pi * i /self.lados
             x = self.raio * cos(angle)
             z = self.raio * sin(angle)
             glTexCoord2f(0.5 + (x / (2 * self.raio)), 0.5 + (z / (2 * self.raio))) #Converte a coordenada do circulo para a de textura primeiramente.

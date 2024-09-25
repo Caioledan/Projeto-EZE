@@ -1,15 +1,16 @@
 from OpenGL.GL import *
 import glm
 
+#vertices do carro
 v1 = [-0.006,-0.006,0]
 v2 = [0.006,-0.006,0]
 v3 = [0,0.006,0]
 v4 = [-0.006,-0.006,0.004]
 v5 = [0.006,-0.006,0.004]
 v6 = [0,0.006,0.004]
-M = glm.mat4(1)
-velocidade = 0.001
-trajeto = [v1,v2,v3,v4,v5,v6]
+M = glm.mat4(1) #matriz indentidade
+velocidade = 0.001 #velocidade do carro para locomoção
+trajeto = [v1,v2,v3,v4,v5,v6]#lista de vértices para desenhar os triangulos da figura.
 
 class Carro:
     def __init__(self, posicao, direcao,lateral):
@@ -19,11 +20,11 @@ class Carro:
         self.velocidade = velocidade
 
 
-    def setarPosicaoInicio(self, x,y,z):
+    def setarPosicaoInicio(self, x,y,z): #função para setar a posição de inicio do carro
         self.posicao.x = x
         self.posicao.y = y
         self.posicao.z = z
-        self.calcMatriz()
+        self.calcMatriz() #Calculo a matriz de transformação com esse vetor.
 
 
     def calcMatriz(self):
@@ -34,14 +35,11 @@ class Carro:
         M[3] = glm.vec4(self.posicao,1) #4 COLUNA POSICAO DO CARRO
 
     def andar(self):
-        self.posicao = self.posicao + velocidade*self.direcao
+        self.posicao = self.posicao + velocidade*self.direcao  #altera a posição a cada frame modificando 
 
 
     def calculaProxDirec(self,vertice):
         vetorVertCarro = glm.normalize(vertice - self.posicao)#Vetor que sai do carro até o vertice e normalizo ele.
-
-        # if glm.length(vetorVertCarro) > 0:
-        #     vetorVertCarro = glm.normalize(vetorVertCarro)
 
         escalar = glm.dot(self.direcao,vetorVertCarro) #Vai me voltar o cosseno desses angulos
         escalar = glm.clamp(escalar, -1.0, 1.0)  #Uso o clamp pra garantir que o valor esteja no intervalo correto.
@@ -50,15 +48,15 @@ class Carro:
         #Faço produto vetorial entre os dois vetores para saber a direção deles.
         produtoVetorial = glm.cross(self.direcao, vetorVertCarro)
         
-        #se a componente Z do produto vetorial for negativa, rotacionar para a direita
+        #se a componente Z do vetor resultante produto vetorial for negativa, rotacionar para a direita
         if produtoVetorial.z < 0:
             angulo = -angulo  #rotaciona para a direita (sentido horário)
         
-        #aplica a rotação da direção e do vetor lateral com base no ângulo e eixo Z
+        #aplica a rotação na direção e no vetor lateral com base no ângulo
         self.direcao = glm.rotate(angulo) * self.direcao
         self.lateral = glm.rotate(angulo) * self.lateral
 
-        self.calcMatriz()
+        self.calcMatriz() #calculo a matriz de transformação com os valores
         
 
     def desenhar(self):

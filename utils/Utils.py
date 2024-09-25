@@ -17,8 +17,8 @@ from map_data import paths
 
 posCameraAtual = glm.vec3(0, 0, 0.02)
 suavizacaoCamera = 0.1  #variavel para a suavização
-vertice = 0
-trajeto = []
+vertice = 0 #variável que incrementa sempre que o carro chegar num vertice, para pegar todos os indices da lista de trajeto.
+trajeto = [] #lista dos vertices do trajeto
 
 
 posicao = glm.vec3(0,0,0) #posição do self.carro
@@ -28,15 +28,16 @@ lateral = glm.vec3(1,0,0) #vetor lateral no eixo x
 janelaLargura = 1920
 janelaAltura = 1080
 
-carro = Carro(posicao, direcao, lateral)
+carro = Carro(posicao, direcao, lateral)#instancia do com as variaveis da sua matriz de transformação.
 
+#variaveis criadas para os dois pontos terem o mesmo tamanho.
 raio = 0.005
 lados = 100
-
 # Chamada para a textura
 point1 = pontos(raio,lados)
 point2 = pontos(raio,lados)
-texId1 = 0
+#indeitificador das duas texturas dos dois pontos
+texId1 = 0 
 texId2 = 0
 
 zoom = 1
@@ -60,7 +61,7 @@ class Utils():
         self.original_position = False
 
 
-    def setup_3d_view(self):
+    def setup_3d_view(self):#função do inicio
         global zoom
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
