@@ -29,8 +29,10 @@ janelaAltura = 800
 carro = Carro(posicao, direcao, lateral)
 
 # Chamada para a textura
-points = pontos()
-texId = 0
+point1 = pontos()
+point2 = pontos()
+texId1 = 0
+texId2 = 0
 
 class Utils():
     def __init__(self):
@@ -201,7 +203,7 @@ class Utils():
             self.rotation_x += 1
 
     def display_callback(self):
-        global texId
+        global texId1, texId2
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
@@ -239,13 +241,18 @@ class Utils():
         if(len(trajeto)):
             loc = int((len(trajeto)/2.0))
 
-            glBindTexture(GL_TEXTURE_2D, texId)
+            glBindTexture(GL_TEXTURE_2D, texId1)
             glPushMatrix()
             glTranslatef(trajeto[loc].x,trajeto[loc].y,trajeto[loc].z + 0.02)  # translação do círculo
-            points.desenhar()
+            point1.desenhar()
+            glPopMatrix()
+            glBindTexture(GL_TEXTURE_2D, texId2)
+            glPushMatrix()
+            glTranslate(trajeto[int(loc * 1.5)].x, trajeto[int(loc * 1.5)].y, trajeto[int(loc * 1.5)].z + 0.02)
+            point2.desenhar()
             glPopMatrix()
             glBindTexture(GL_TEXTURE_2D, 0)  # desassociar a textura
-
+            
         glutSwapBuffers()
 
 
@@ -288,7 +295,7 @@ class Utils():
 
 
     def main(self):
-        global trajeto, texId
+        global trajeto, texId1, texId2
         # Inicializa GLUT
         glutInit()
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
@@ -298,7 +305,10 @@ class Utils():
         self.setup_3d_view()
 
         glEnable(GL_TEXTURE_2D)
-        texId = points.sortearTextura()
+        texId1 = point1.sortearTextura()
+        texId2 = point2.sortearTextura()
+        if texId1 == texId2:
+            texId2 = point2.sortearTextura()
 
         # Configuração do mapa
         filename = "data/map.osm"
