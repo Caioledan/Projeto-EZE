@@ -7,15 +7,18 @@ raio = 0.005
 lados = 100
 
 textura1 = "utils/textures/acidente.png"
-textura2 = "utils/textures/acidente.png"
-textura3 = "utils/textures/acidente.png"
-textura4 = "utils/textures/acidente.png"
+textura2 = "utils/textures/radar.png"
+textura3 = "utils/textures/policia.png"
+textura4 = "utils/textures/buraco.png"
 
 
 class pontos:
     def __init__(self):
         self.raio = raio
         self.lados = lados
+        self.angulo = 0
+        self.desloc = 0
+
 
 
 
@@ -58,6 +61,15 @@ class pontos:
 
     def desenhar(self):
         global raio,lados
+
+        glPushMatrix()
+
+        self.angulo += 5 # Fator que definirá a velocidade de rotação
+        self.desloc = 0.003 * sin(self.angulo * pi/180) # Usando o fator 0.003 multiplicando a função seno, o movimento se torna suave no eixo z
+        glTranslate(0,0,self.desloc) # Função que faz o ícone ter um movimento suave para cima e para baixo
+
+        glRotate(self.angulo, 0, 0, 1) # Função que faz o ícone rotacionar em torno de si mesmo, no eixo z
+
         glBegin(GL_TRIANGLE_FAN)
         glTexCoord2f(0.5, 0.5)  #Começo colocando o meio da coordenada de textura da imagem no meio da figura do circulo.
         glVertex3f(0,0, 0)  
@@ -68,3 +80,5 @@ class pontos:
             glTexCoord2f(0.5 + (x / (2 * raio)), 0.5 + (z / (2 * raio))) #Converte a coordenada do circulo para a de textura primeiramente.
             glVertex3f(x, 0,z)
         glEnd()
+        glPopMatrix()
+

@@ -187,7 +187,6 @@ class Utils():
         elif key == b'\r':
             self.move = not self.move
         elif key == b'c':
-            print("ENTREI")
             self.cam = not self.cam
 
 
@@ -255,6 +254,7 @@ class Utils():
 
         #a cada frame é necessário chamar essa função para 'agendar' a sua próxima execução.
         glutTimerFunc(int(1000/60), self.timer, 0)  
+        
 
         if self.cam: # Se o carro começar a andar, atualiza a câmera para ele.
             #Atualizando a posição da câmera
