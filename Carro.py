@@ -38,6 +38,7 @@ class Carro:
     def andar(self):
         self.posicao = self.posicao + velocidade*self.direcao
 
+
     def calculaProxDirec(self,vertice):
         vetorVertCarro = glm.normalize(vertice - self.posicao)#Vetor que sai do carro até o vertice e normalizo ele.
         escalar = glm.dot(self.direcao,vetorVertCarro) #Vai me voltar o cosseno desses angulos
@@ -51,9 +52,9 @@ class Carro:
             angulo = -angulo  #rotaciona para a direita (sentido horário)
         
         #aplica a rotação da direção e do vetor lateral com base no ângulo e eixo Z
+
         self.direcao = glm.rotate(angulo) * self.direcao
         self.lateral = glm.rotate(angulo) * self.lateral
-
         self.calcMatriz()
         
 

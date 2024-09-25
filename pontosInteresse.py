@@ -2,9 +2,9 @@ from OpenGL.GL import *
 from PIL import Image  
 from math import pi,cos,sin
 from random import randint
+from glm import lerp
 
-raio = 1
-lados = 100
+
 
 textura1 = "textures/acidente.png"
 textura2 = "textures/buraco.png"
@@ -13,9 +13,10 @@ textura4 = "textures/radar.png"
 
 
 class pontos:
-    def __init__(self):
+    def __init__(self,raio,lados):
         self.raio = raio
         self.lados = lados
+        self.expandindo = True
 
 
 
@@ -56,15 +57,18 @@ class pontos:
         if numero == 4: return self.carregaTextura(textura4)
 
 
+    def pulsar(self):
+        pass
+
+
     def desenhar(self):
-        global raio,lados
         glBegin(GL_TRIANGLE_FAN)
         glTexCoord2f(0.5, 0.5)  #Começo colocando o meio da coordenada de textura da imagem no meio da figura do circulo.
         glVertex3f(0,0, 0)  
-        for i in range(lados + 1):
-            angle = 2.0 * pi * i /lados
-            x = raio * cos(angle)
-            z = raio * sin(angle)
-            glTexCoord2f(0.5 + (x / (2 * raio)), 0.5 + (z / (2 * raio))) #Converte a coordenada do circulo para a de textura primeiramente.
+        for i in range(self.lados + 1):
+            angle = 2.0 * pi * i /self.lados
+            x = self.raio * cos(angle)
+            z = self.raio * sin(angle)
+            glTexCoord2f(0.5 + (x / (2 * self.raio)), 0.5 + (z / (2 * self.raio))) #Converte a coordenada do circulo para a de textura primeiramente.
             glVertex3f(x, 0,z)
         glEnd()

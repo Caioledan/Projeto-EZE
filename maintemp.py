@@ -20,10 +20,12 @@ trajeto = [glm.vec3(2,2,0),
            glm.vec3(-5,10,0),
            glm.vec3(-50,11,0)] #percurso
 
-
+raio = 1
+lados = 100
 carro = Carro(posicao,direcao,lateral)
-ponto = pontos()
+ponto = pontos(raio,lados)
 texId = 0
+
 
 def desenhapercurso():
     global trajeto
@@ -85,14 +87,14 @@ def timer(v):
     #Atualizando a posição da câmera
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    
+
     posCameraDesejada = carro.posicao - carro.direcao + glm.vec3(0, 0, 0.75) #posição desejada da câmera, atrás do vetor direção carro.
     posCameraAtual = glm.lerp(posCameraAtual, posCameraDesejada, suavizacaoCamera)#faz uma transição suave entre a posição de camera atual com a que deseja chegar.
 
     gluLookAt(posCameraAtual.x, posCameraAtual.y, posCameraAtual.z,  #posição suavizada da câmera
               *carro.posicao,  # Ponto suavizado para o qual a câmera olha
               0, 0, 1)  # Vetor 'up' (definindo o eixo Z como "para cima")
-    
+
 
     if vertice < len(trajeto):
         if(glm.distance(carro.posicao,trajeto[vertice]) < 0.1): #Ao chegar no vértice, recalcula para o outro.
@@ -106,8 +108,19 @@ def timer(v):
         else:#Se não estiver perto do outro vértice, vai andando até chegar nele.
             carro.andar() 
             carro.calcMatriz()
-
+    glPushMatrix()
+    if glm.distance(carro.posicao, trajeto[3]) < 4:  # Verifica se o carro está próximo ao ponto
+        if ponto.expandindo:#expandindo foi criado para saber a hora de aumentar o raio do circulo ou diminuir.
+            ponto.raio += 0.02  #se for true, o raio aumenta a cada desenho.
+            if ponto.raio >= 1.5:  #limite superior do raio
+                ponto.expandindo = False  #depois que chegar no limite, vira false para começar a decrementar
+        else:  #se o ponto está em fase de contração
+            ponto.raio -= 0.02  #diminui o raio a cada frame
+            if ponto.raio <= 1.0:  #se passar do valor minimo do raio, coloco true para aumentar de novo.
+                ponto.expandindo = True
+    glPopMatrix()
     glutPostRedisplay()
+
 
 
 
@@ -124,13 +137,13 @@ def desenhar():
 
     desenhapercurso()
 
-
     glBindTexture(GL_TEXTURE_2D, texId)  # vinculando a textura
     glPushMatrix()
     glTranslatef(trajeto[3].x,trajeto[3].y,trajeto[3].z+1)  # translação do círculo
     ponto.desenhar()  # desenhando o círculo
     glPopMatrix()
     glBindTexture(GL_TEXTURE_2D, 0)  # desassociar a textura
+
   
     glutSwapBuffers()
 
