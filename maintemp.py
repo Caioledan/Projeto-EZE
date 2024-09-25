@@ -4,11 +4,15 @@ from OpenGL.GLU import *
 import glm
 from Carro import *
 import numpy as np
-
+from pontosInteresse import *
+from pontosInteresse import *
 
 posicao = glm.vec3(0,0,0) #posição do carro
 direcao = glm.vec3(0,1,0) #vetor direção no eixo y
 lateral = glm.vec3(1,0,0) #vetor lateral no eixo x
+
+
+
 
 
 trajeto = [glm.vec3(2,2,0),
@@ -22,6 +26,8 @@ trajeto = [glm.vec3(2,2,0),
 
 
 carro = Carro(posicao,direcao,lateral)
+ponto = pontos()
+texId = 0
 
 def desenhapercurso():
     global trajeto
@@ -51,12 +57,15 @@ def desenhaLinhasXeYeZ():
     glEnd()
 
 def inicio():
+    global texId
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     glOrtho(-5,5,-5,5,-5,100) #Largura da projeção
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     gluLookAt(carro.posicao.x,carro.posicao.y-1,1,2,2,0,0,0,1)
+    glEnable(GL_TEXTURE_2D)
+    texId = ponto.sortearTextura()
     
 
     glClearColor(0.5,0.5,0.5,0.5)#Cor do fundo
@@ -107,6 +116,7 @@ def timer(v):
 
 
 def desenhar():
+    global texId
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) # Limpa o conteÃºdo do frame buffer aplicando a cor usada em glClearColor em toda a imagem
     
     desenhaLinhasXeYeZ()
@@ -117,6 +127,14 @@ def desenhar():
     glPopMatrix()
 
     desenhapercurso()
+
+
+    glBindTexture(GL_TEXTURE_2D, texId)  # vinculando a textura
+    glPushMatrix()
+    glTranslatef(trajeto[3].x,trajeto[3].y,trajeto[3].z+1)  # translação do círculo
+    ponto.desenhar()  # desenhando o círculo
+    glPopMatrix()
+    glBindTexture(GL_TEXTURE_2D, 0)  # desassociar a textura
   
     glutSwapBuffers()
 
