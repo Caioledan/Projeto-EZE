@@ -20,12 +20,6 @@ def draw_map_with_depth(nodes, ways, bbox, street_width=0.001, depth=0.001):
             x1, y1, z1 = latlon_to_opengl(node1[0], node1[1], bbox, z=0)
             x2, y2, z2 = latlon_to_opengl(node2[0], node2[1], bbox, z=0)
 
-            # Aumenta a escala das coordenadas
-            # x1 *= scale_factor
-            # y1 *= scale_factor
-            # x2 *= scale_factor
-            # y2 *= scale_factor
-
             # Vetor de direção da rua (vetor entre os dois nós)
             direction = np.array([x2 - x1, y2 - y1])
             direction = direction / np.linalg.norm(direction)  # Normaliza o vetor
@@ -116,6 +110,9 @@ def draw_buildings_as_cubes(nodes, buildings, bbox, building_width=0.0001, build
 
         # Desenhar as faces do prédio como cubo
         for i in range(len(vertices)):
+            # Para cada vértice i e o próximo vértice next_i (para fechar o polígono), desenha-se a base do cubo.
+            # A base é desenhada com os quatro vértices ao redor de cada ponto do prédio, ajustando as coordenadas em relação à largura do prédio (building_width).
+
             next_i = (i + 1) % len(vertices)
 
             # Face inferior (base do cubo)
@@ -132,6 +129,7 @@ def draw_buildings_as_cubes(nodes, buildings, bbox, building_width=0.0001, build
 
             # Desenhar as faces laterais (laterais do cubo)
             # Lado 1
+            # Para cada par de vértices, desenha-se também as laterais, ligando a base ao teto e seus casos analogos
             glVertex3f(vertices[i][0] - building_width/2, vertices[i][1] - building_width/2, 0)
             glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] - building_width/2, 0)
             glVertex3f(vertices[next_i][0] - building_width/2, vertices[next_i][1] - building_width/2, building_height)

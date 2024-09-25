@@ -70,8 +70,11 @@ class Utils():
 
 
     def setup_lighting(self):
+        # Na definicao da luz do objeto, é feita uma luz Spot com feixe de 30 graus
+        # 
+
         glEnable(GL_LIGHTING)  # Habilita o sistema de iluminação
-        glEnable(GL_LIGHT0)    # Habilita uma luz (Luz 0)
+        glEnable(GL_LIGHT0)    # Habilita uma luz (Luz 0), luz posicional que emite luz em todo o ponto selecionado
 
         # Posiciona a luz ligeiramente à frente do carro, seguindo sua direção
         light_position = [
@@ -132,7 +135,7 @@ class Utils():
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-
+    #Leitura do arquivo do mapa
     def read_osm(self, filename):
         handler = OSMHandler()
         handler.apply_file(filename)
